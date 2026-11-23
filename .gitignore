@@ -75,3 +75,6 @@ __pycache__/
 .venv/
 venv/
 node_modules/
+
+# 仓库不公开说明文档（用户要求：先只传文件，等完善后再写）
+/README.md
