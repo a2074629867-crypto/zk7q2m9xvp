@@ -1,0 +1,12 @@
+{"id": "c1_0013", "voice": "Joseph_nervous_1", "emo": "紧张", "ref": "Joseph_nervous_c043.wav", "ok": true, "dur": 10.08, "sec": 164.4, "size": 967724, "mt": 384}
+{"id": "c1_0034", "voice": "Thomas_wronged_1", "emo": "委屈", "ref": "Thomas_wronged_1.wav", "ok": false, "dur": 0.48, "sec": 14.2, "size": 46124, "mt": 240}
+{"id": "c1_0052", "voice": "Thomas_defiant_1", "emo": "激动反抗", "ref": "Thomas_defiant_1.wav", "ok": true, "dur": 3.84, "sec": 43.1, "size": 368684, "mt": 180}
+{"id": "c2_0210", "voice": "Thomas_wary_1", "emo": "警惕", "ref": "Thomas_wary_1.wav", "ok": true, "dur": 2.72, "sec": 33.3, "size": 261164, "mt": 240}
+{"id": "c2_0430", "voice": "Joseph_defiant_1", "emo": "激动反抗", "ref": "Joseph_defiant_c005.wav", "ok": true, "dur": 0.96, "sec": 23.0, "size": 92204, "mt": 192}
+{"id": "c2_0447", "voice": "Joseph_defiant_1", "emo": "激动反抗", "ref": "Joseph_defiant_c005.wav", "ok": false, "dur": 0.16, "sec": 12.6, "size": 15404, "mt": 264}
+{"id": "c2_0468", "voice": "Thomas_defiant_1", "emo": "激动反抗", "ref": "Thomas_defiant_1.wav", "ok": true, "dur": 8.0, "sec": 72.8, "size": 768044, "mt": 384}
+{"id": "c3_0637", "voice": "Thomas_wary_1", "emo": "警惕", "ref": "Thomas_wary_1.wav", "ok": true, "dur": 2.72, "sec": 34.6, "size": 261164, "mt": 276}
+{"id": "c3_0643", "voice": "Thomas_defiant_1", "emo": "激动反抗", "ref": "Thomas_defiant_1.wav", "ok": true, "dur": 3.68, "sec": 47.6, "size": 353324, "mt": 252}
+{"id": "c3_0954", "voice": "Helena_wronged_1", "emo": "委屈", "ref": "Helena_wronged_c497.wav", "ok": true, "dur": 7.52, "sec": 80.8, "size": 721964, "mt": 336}
+{"id": "c2_0324", "voice": "Thomas_wary_1", "emo": "警惕", "ref": "Thomas_wary_1.wav", "ok": true, "dur": 1.12, "sec": 20.8, "size": 107564, "mt": 192}
+{"id": "c2_0487", "voice": "Charles_wary_1", "emo": "警惕", "ref": "Charles_wary_1.wav", "ok": true, "dur": 5.28, "sec": 73.8, "size": 506924, "mt": 312}

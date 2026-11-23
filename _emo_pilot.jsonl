@@ -1,0 +1,12 @@
+{"id": "c1_0163", "emo": "紧张", "type": "afraid", "cond": "ctl", "src": "c1_0163.wav", "ins": "You came – you were brought here as a baby.", "ok": true, "dur": 4.16, "sec": 69.9}
+{"id": "c1_0163", "emo": "紧张", "type": "afraid", "cond": "emo", "src": "c1_0163.wav", "ins": "<emo type=\"afraid\" level=\"2\">You came – you were brought here as a baby</emo>.", "ok": true, "dur": 2.56, "sec": 29.7}
+{"id": "c2_0246", "emo": "紧张", "type": "afraid", "cond": "ctl", "src": "c2_0246.wav", "ins": "Nothing, it's nothing. It's only a pebble.", "ok": true, "dur": 2.4, "sec": 24.5}
+{"id": "c2_0246", "emo": "紧张", "type": "afraid", "cond": "emo", "src": "c2_0246.wav", "ins": "<emo type=\"afraid\" level=\"2\">Nothing, it's nothing. It's only a pebble</emo>.", "ok": true, "dur": 4.16, "sec": 37.2}
+{"id": "c2_0302", "emo": "警惕", "type": "disgusted", "cond": "ctl", "src": "c2_0302.wav", "ins": "Is it a picture of him in the Battle?", "ok": true, "dur": 2.08, "sec": 19.8}
+{"id": "c2_0302", "emo": "警惕", "type": "disgusted", "cond": "emo", "src": "c2_0302.wav", "ins": "<emo type=\"disgusted\" level=\"2\">Is it a picture of him in the Battle</emo>?", "ok": true, "dur": 2.24, "sec": 22.8}
+{"id": "c2_0427", "emo": "警惕", "type": "disgusted", "cond": "ctl", "src": "c2_0427.wav", "ins": "He might be anywhere. I don't know where.", "ok": true, "dur": 3.52, "sec": 32.3}
+{"id": "c2_0427", "emo": "警惕", "type": "disgusted", "cond": "emo", "src": "c2_0427.wav", "ins": "<emo type=\"disgusted\" level=\"2\">He might be anywhere. I don't know where</emo>.", "ok": true, "dur": 4.64, "sec": 38.6}
+{"id": "c2_0309", "emo": "委屈", "type": "sad", "cond": "ctl", "src": "c2_0309.wav", "ins": "Here's the picture, look – that's my father.", "ok": true, "dur": 2.72, "sec": 26.7}
+{"id": "c2_0309", "emo": "委屈", "type": "sad", "cond": "emo", "src": "c2_0309.wav", "ins": "<emo type=\"sad\" level=\"2\">Here's the picture, look – that's my father</emo>.", "ok": true, "dur": 5.12, "sec": 43.3}
+{"id": "c3_0838", "emo": "兴奋", "type": "happy", "cond": "ctl", "src": "c3_0838.wav", "ins": "Yes, every sort of moth in the world.", "ok": true, "dur": 2.08, "sec": 20.3}
+{"id": "c3_0838", "emo": "兴奋", "type": "happy", "cond": "emo", "src": "c3_0838.wav", "ins": "<emo type=\"happy\" level=\"2\">Yes, every sort of moth in the world</emo>.", "ok": true, "dur": 5.6, "sec": 47.2}

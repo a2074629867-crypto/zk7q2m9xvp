@@ -1,0 +1,7 @@
+#!/bin/bash
+cd /g/_setup
+PY="G:/Python310/python.exe"
+for ch in ch1 ch2 ch3; do
+  echo "=== $ch 原速 ==="
+  "$PY" -u mt_post.py --ch $ch --plan mt_plan3b.json --uniform --out ${ch}_os.wav 2>&1 | tail -4
+done

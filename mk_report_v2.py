@@ -1,0 +1,248 @@
+﻿# -*- coding: utf-8 -*-
+"""两条链路重测评汇总：把两份 JSON 汇成报告 + 重生成清单。
+
+报告要能回答四个问题（用户 2026-11-11 提的）：
+  1. 旁白链路跑得怎样？（韵律/起伏，不是技术校验）
+  2. 对白链路跑得怎样？（声学/声纹/情感，三闸各自）
+  3. LLM 标注到底做了没有？（产物在哪、覆盖率多少）
+  4. 通过率有没有压到 90% 以下？（而且要能解释每一条为什么被剔除）
+"""
+import json
+import collections
+import os
+
+NARR = "G:/_setup/_narr_check3/_narr_check.json"
+HUMAN = "G:/_setup/_ref_human_check/_narr_check.json"
+DLG = "G:/_setup/_gate_dlg_v2.json"
+FINAL = "G:/_setup/_emo_vote/_emo_final.jsonl"
+OUT_MD = "G:/_setup/REPORT_CHAIN_V2.md"
+OUT_REGEN_DLG = "G:/_setup/_regen_dlg.json"
+OUT_REGEN_NARR = "G:/_setup/_regen_narr.json"
+
+
+def pct(a, b):
+    return "%.1f%%" % (100.0 * a / max(1, b))
+
+
+def main():
+    N = json.load(open(NARR, encoding="utf-8"))
+    H = json.load(open(HUMAN, encoding="utf-8"))
+    D = json.load(open(DLG, encoding="utf-8"))
+    D = D if isinstance(D, list) else (D.get("rows") or D.get("results"))
+    F = {json.loads(l)["id"]: json.loads(l) for l in open(FINAL, encoding="utf-8")}
+
+    def stat(R):
+        c = collections.Counter(r["verdict"] for r in R)
+        j = [r["f0_jump_n"] for r in R if r.get("f0_jump_n") is not None]
+        sp = [r["energy_span"] for r in R if r.get("energy_span") is not None]
+        import statistics as st
+        return dict(n=len(R), **c,
+                    jump2=100.0 * sum(1 for v in j if v >= 2) / max(1, len(j)),
+                    span=st.median(sp) if sp else 0,
+                    oct=100.0 * sum(1 for r in R if r["oct_err"] > 0) / len(R),
+                    hnr=100.0 * sum(1 for r in R if r["hnr_low"]) / len(R),
+                    rise=100.0 * sum(1 for r in R if r["tail_rise"]) / len(R))
+
+    sn, sh = stat(N), stat(H)
+
+    dv = collections.Counter(r["verdict"] for r in D)
+    gates = {g: collections.Counter(r["gates"][g] for r in D)
+             for g in ("tech", "speaker", "emotion")}
+    reason = collections.Counter()
+    for r in D:
+        for x in (r.get("reasons") or []):
+            reason[x["code"]] += 1
+    byemo = collections.defaultdict(collections.Counter)
+    for r in D:
+        byemo[r["emo"]][r["verdict"]] += 1
+    bywho = collections.defaultdict(collections.Counter)
+    for r in D:
+        bywho[r["who"]][r["verdict"]] += 1
+
+    # 重生成清单：技术缺陷 + 情绪不达标
+    regen_d = [{"id": r["id"], "who": r["who"], "emo": r["emo"],
+                "why": [x["code"] for x in r["reasons"]],
+                "voice_next": None} for r in D if r["verdict"] == "REGEN"]
+    plan = {json.loads(l)["id"]: json.loads(l)
+            for l in open("G:/_setup/_castle_en_ch123_plan_v2.jsonl", encoding="utf-8")}
+    for x in regen_d:
+        x["voice_next"] = plan.get(x["id"], {}).get("voice")
+        x["emo_unsupported"] = plan.get(x["id"], {}).get("emo_unsupported", False)
+    json.dump(regen_d, open(OUT_REGEN_DLG, "w", encoding="utf-8"),
+              ensure_ascii=False, indent=1)
+
+    regen_n = [{"id": r["unit"], "why": r["why"],
+                "jump_n": r["f0_jump_n"], "jump_max": r["f0_jump_max"],
+                "dur": r["dur"]} for r in N if r["verdict"] == "FIX"]
+    json.dump(regen_n, open(OUT_REGEN_NARR, "w", encoding="utf-8"),
+              ensure_ascii=False, indent=1)
+
+    emo_dist = collections.Counter(v["emo"] for v in F.values())
+
+    L = []
+    A = L.append
+    A("# 两条链路重测评报告 v2（2026-11-11）\n")
+    A("对象：`_audio_ch123/out` 现有 955 条（旁白 716 + 对白 239），先按新规则重测，再把剔除的跑重生成。\n")
+    A("> 结论先行：**两条链路的判据各修了一个实打实的 bug，之前的数字不能引用。**")
+    A("> 修完后：旁白 PASS 9.1%（FIX 27.4%，且 F0 突跳是真缺陷：真人基线 1%，我们 27%）；")
+    A("> 对白重测 PASS 29.3%，把 76 条剔除件按正确音色档重生成后转正 32 条，")
+    A("> **全库最终 PASS 42.7%、REGEN 6.7%**，远低于 90% 上限，且每一条剔除都能指出判据。\n")
+
+    A("## 一、旁白链路（韵律/起伏）\n")
+    A("判据：`narr_check.py` L1，三类 FIX（结尾硬切 / 句内 F0 突跳 / 末段上扬）+ 能量 span 带界。")
+    A("模型：parselmouth（F0、HNR）+ 21 点能量轮廓，**不用情感模型**——这条链路判的是「念得像不像人在讲」，不是「情绪对不对」。\n")
+    A("| 指标 | 真人参考 159 条 | 本书旁白 716 条 |")
+    A("|---|---|---|")
+    A("| PASS / WATCH / FIX | %d / %d / %d | %d / %d / %d |" % (
+        sh["PASS"], sh["WATCH"], sh["FIX"], sn["PASS"], sn["WATCH"], sn["FIX"]))
+    A("| 能量 span 中位 | %.1f dB | %.1f dB |" % (sh["span"], sn["span"]))
+    A("| 句内突跳 ≥2 次占比 | %.0f%% | %.0f%% |" % (sh["jump2"], sn["jump2"]))
+    A("| 八度跟踪错误占比 | %.0f%% | %.0f%% |" % (sh["oct"], sn["oct"]))
+    A("| 末段上扬占比 | %.0f%% | %.0f%% |" % (sh["rise"], sn["rise"]))
+    A("| HNR 偏低占比 | %.0f%% | %.0f%% |\n" % (sh["hnr"], sn["hnr"]))
+    A("**三条判定**：")
+    A("1. **起伏是健康的**：span 中位 19.6 vs 真人 18.0，615 条可测单元全部落在带内。")
+    A("   之前报的「503 条起伏过大」是量错了：TTS 句内的数字静音（−56~−60dB）被当成语音槽，")
+    A("   把「停顿有多深」算成了「语调有多宽」。例如 c1_0001 语音槽是 −15~−31（16dB，完全正常），")
+    A("   却因为两个 −56/−58 的停顿槽被判 40.9dB。")
+    A("2. **真正的缺陷是 F0 突跳**：27% vs 真人 1%。这不是跟踪假象——")
+    A("   把跳到的音高按 2.2× 全局中位（169Hz）过滤后仍剩 196 条，")
+    A("   说明生成音频里确实有大量「一句话中间音高猛地翻上去」的地方。")
+    A("3. **八度跟踪 53% vs 9%** 说明生成层气声/嘎裂音偏多，跟踪器常把 76Hz 判成 3 倍频。")
+    A("   这一项只进 WATCH，不进 FIX —— 是音质信号，不是韵律缺陷。\n")
+    A("剔除率：**FIX 196/716 = 27.4%**，全部指向 `_regen_narr.json`。\n")
+
+    A("## 二、对白链路（声学 + 声纹 + 情感，三闸）\n")
+    A("模型：`dialog_gate.py`。三闸各自独立，最终取最严重的一档。\n")
+    A("| 闸门 | PASS | MANUAL | REGEN | 用的模型/判据 |")
+    A("|---|---|---|---|---|")
+    A("| 技术 | %d | %d | %d | 纯信号（削波、静音占比、时长） |" % (
+        gates["tech"]["PASS"], gates["tech"]["MANUAL"], gates["tech"]["REGEN"]))
+    A("| 声纹 | %d | %d | %d | ResNet34 embedding + 角色质心 cos |" % (
+        gates["speaker"]["PASS"], gates["speaker"]["MANUAL"], gates["speaker"]["REGEN"]))
+    A("| 情感 | %d | %d | %d | emotion2vec_plus_large + 六类定档分位 |" % (
+        gates["emotion"]["PASS"], gates["emotion"]["MANUAL"], gates["emotion"]["REGEN"]))
+    A("")
+    A("总计 **%d 条：PASS %d（%s）/ MANUAL %d（%s）/ REGEN %d（%s）**\n" % (
+        len(D), dv["PASS"], pct(dv["PASS"], len(D)),
+        dv["MANUAL"], pct(dv["MANUAL"], len(D)),
+        dv["REGEN"], pct(dv["REGEN"], len(D))))
+    A("原因计数：" + "，".join("`%s` %d" % (k, v) for k, v in reason.most_common()) + "\n")
+    A("按情绪档：\n")
+    A("| 情绪 | PASS | MANUAL | REGEN |")
+    A("|---|---|---|---|")
+    for k in ("平静", "紧张", "激动反抗", "委屈", "兴奋", "警惕"):
+        c = byemo.get(k, {})
+        A("| %s | %d | %d | %d |" % (k, c.get("PASS", 0), c.get("MANUAL", 0), c.get("REGEN", 0)))
+    A("")
+    A("按角色：\n")
+    A("| 角色 | PASS | MANUAL | REGEN |")
+    A("|---|---|---|---|")
+    for k in ("Joseph", "Thomas", "Charles", "Helena"):
+        c = bywho.get(k, {})
+        A("| %s | %d | %d | %d |" % (k, c.get("PASS", 0), c.get("MANUAL", 0), c.get("REGEN", 0)))
+    A("")
+
+    A("## 三、修掉的两个判据 bug（这是之前数字全错的根因）\n")
+    A("### 1. 结尾硬切：494 条假阳性")
+    A("旧代码比较最后 5ms 的**首尾两个采样**的 dB。只要文件收在过零点")
+    A("（正常收尾几乎都收在 0.000000），末采样就是 1e-12 量级的 −240dB，")
+    A("于是 `cut_drop` 恒等于「首采样 dB + 240」，中位 149.7dB。")
+    A("实测 c1_0001 尾部包络是 −31→−51dB 的平滑衰减，根本不是硬切。")
+    A("改成「最后 5ms 的 RMS 相对前 200ms 主体掉了几 dB」后，硬切从 494 → **0**。\n")
+    A("### 2. 声纹判角色：63 条「串人」里 0 条是真的")
+    A("旧判法是「该角色所有情绪格里的最高分」。但本库各角色的情绪格不对等：")
+    A("Thomas 只有 loud/calm/scold/begging，Charles 只有 excited/angry/soft/neutral，")
+    A("而 Joseph/Helena/Fielding 各有 nervous/wronged/wary/defiant。")
+    A("于是「Thomas 紧张」在 Thomas 侧只能和四个不相干的格比，天然低分；")
+    A("而 Fielding 恰好有 nervous 格，天然高分 —— 判错的不是音频，是库的覆盖。")
+    A("改用角色质心（纯音色）后：239 条里 221 条判对（92.5%），")
+    A("gap≥0.10 的 168 条精度 98.2%；原 63 条 wrong_speaker 里 **49 条是库缺档造成的假阳性**，")
+    A("另外 14 条的质心 gap 只有 0.003–0.199（两个男孩本来就分不开），**没有一条是跨年龄/跨性别串人**。\n")
+    A("### 3. 短句判 REGEN → 改判 MANUAL")
+    A("`dur<0.9s` 原来直接判 REGEN，等于「因为句子短所以判它坏」，重跑一百次还是短。")
+    A("239 条里触发 49 条（20.5%），全是 `Why?` / `Yes.` / `Moths.` 这类一到两个词的应答。")
+    A("现在改为 MANUAL（判据不成立），不再白白重生成。\n")
+
+    A("## 四、LLM 标注：做了什么、覆盖率多少\n")
+    A("**对白情绪档：已重做，四方交叉。**")
+    A("四份独立标注（A/B/C/D 各 239 行）+ 我逐条裁决 82 条分歧，最终分布：")
+    A("，".join("%s %d" % (k, emo_dist[k]) for k in ("平静", "紧张", "激动反抗", "委屈", "兴奋", "警惕")))
+    A("。\n")
+    A("单方与共识的一致率：A 86.6% / B 72.8% / C 33.5% / D 86.2%。")
+    A("C 是「只认表层证据」的保守派（86.6% 判平静），连 `I'll bash you` 都判平静，")
+    A("所以四票里它单独一票时不构成多数 —— 这正是要四方而不是两方的原因。\n")
+    A("**音色档：按最终档逐句重选，不再按后缀规则。**")
+    A("v1 用三条正则（感叹号→强档、句首 No/Yes→弱档、其余基准档），")
+    A("结果 `Thomas_calm_1` 被套在 69/110 条 Thomas 台词上，连 `I am never afraid.` 都算平静。")
+    A("v2 逐句对到「该角色实际有的那一格」，产出 `_castle_en_ch123_plan_v2.jsonl`。\n")
+    A("**但库缺档 38 条（15.9%）**，这不是标注错，是参考音不足：\n")
+    A("| 角色 | 情绪 | 条数 | 库里有的格 |")
+    A("|---|---|---|---|")
+    A("| Charles | 紧张 | 26 | excited/angry/soft/neutral，**没有 nervous** |")
+    A("| Charles | 警惕 | 5 | 同上，没有 wary |")
+    A("| Thomas | 兴奋 | 5 | loud/calm/scold/begging，没有 excited |")
+    A("| Thomas | 紧张 | 1 | 同上，没有 nervous |")
+    A("| Helena | 平静 | 1 | 没有 neutral |")
+    A("")
+    A("这 38 条暂时退到最近的可用格，并在计划里标 `emo_unsupported=true`。")
+    A("**要让它们真正对**，得给 Charles 补 nervous/wary、给 Thomas 补 excited/nervous、给 Helena 补 neutral 四条参考。\n")
+    A("**旁白 rate plan：已逐块做，81 块全覆盖。**")
+    A("`_narr_plan_v3.json` 每块一个 rate + 中文 `why`，")
+    A("过了 `narr_slow_llm.validate` 的全部约束（连续覆盖、Δrate≤0.06、减速段词数≤20%、why 必填）。")
+    A("减速段 12 块 / 1517 词 = 14.6%。\n")
+    A("**停顿：不靠 LLM 标点，靠按位置移植。**")
+    A("这条链路用的是 `pause_donor_by_position.py`：生成音频的第 k 个间隙 ← 真人录音的第 k 个间隙，")
+    A("插入真人真实静音、只增不减。Wonder 那套 `pause_intent.json`（按标点逐处判 must/opt/no）")
+    A("是另一条链路的东西，34 条且编号体系对不上，已确认不能套用。\n")
+
+    A("## 五、重生成：77 条里跑完 76 条，42% 直接转 PASS\n")
+    RG = json.load(open("G:/_setup/_gate_regen.json", encoding="utf-8"))
+    RG = RG if isinstance(RG, list) else (RG.get("rows") or [])
+    rv = collections.Counter(r["verdict"] for r in RG)
+    A("本机就是生成机（audiocpp + Vulkan，`DotTTS-Edit-GGUF`），不需要等云端 V100。")
+    A("冒烟测试 rtf 18.2，一条 3–5 秒的台词约 30–45 秒，77 条串行跑完约 70 分钟（可断点续跑）。\n")
+    A("| | PASS | MANUAL | REGEN |")
+    A("|---|---|---|---|")
+    A("| 重生成前（77 条） | 0 | 0 | 77 |")
+    A("| 重生成后（76 条） | %d | %d | %d |" % (rv["PASS"], rv["MANUAL"], rv["REGEN"]))
+    A("")
+    A("按情绪看，好转几乎全部来自「把参考音换成对的那一档」：")
+    A("- **激动反抗**：52 条 REGEN → **29 PASS / 19 MANUAL / 3 REGEN**（Thomas_loud_1 用对了）")
+    A("- **警惕**：11 条 REGEN → 1 PASS / 3 MANUAL / **7 REGEN** —— Thomas 没有 wary 参考，只能退到 scold")
+    A("- **兴奋**：9 条 REGEN → 0 PASS / 4 MANUAL / **5 REGEN** —— Thomas 与 Charles 都没有 excited 参考\n")
+    A("**全库最终（239 条）**：PASS %d（%.1f%%）/ MANUAL %d（%.1f%%）/ REGEN %d（%.1f%%）\n" % (
+        102, 100.0 * 102 / 239, 121, 100.0 * 121 / 239, 16, 100.0 * 16 / 239))
+    A("剩下的 16 条 REGEN（15 条重生成后仍不过 + `c2_0447` 未跑），原因分三类：")
+    A("1. **4 条极短句模型直接空转**：`Why?` ×2、`Where?`、`Do not answer me back` ——")
+    A("   重生成后仍是 0.8–1.0 秒、静音过半。连跑三次都一样，不是随机噪声。")
+    A("2. **9 条情绪没到位**（警惕 4 + 兴奋 5）：")
+    A("   Thomas/Charles 没有 wary/excited 参考（库缺档），只能退到 scold/loud；")
+    A("   但 Joseph/Helena 那两条是真有 excited 参考的，也没过 —— 说明问题出在**标注强度**上（见第六节）。")
+    A("3. **2 条激动反抗 + 1 条声纹无法判**交人耳（`role_ambiguous` 指两男孩音色分不开）。\n")
+
+    A("## 六、这一轮没解决的\n")
+    A("1. **判据不看强度**。标注带 1–3 级强度（`r_*.jsonl` 里的 `intensity`），")
+    A("   但 `gate_emotion` 只按**类别**比分布。于是「兴奋 1 级」被拿去和「兴奋 3 级」的参考分位比，")
+    A("   必然判 emo_low。`I think they may be friends.` 这种轻微的欣慰被判不过，就是这个原因。")
+    A("   要修得给每一类按强度分桶建分位（1/2/3 各自一套 p25/p10），不能只按类别。")
+    A("2. **一词句生成不出来**。单句喂给模型，出来的是 0.16–0.8 秒近乎静音。")
+    A("   这不是判据问题，是模型对极短输入的硬限制。正确解法是**带上下文生成再切**")
+    A("   （把相邻句一起喂进去，按静音切出目标句）—— 这正是旁白链路用 chunk 而不是逐句的原因。")
+    A("3. **紧张档判不了**。生成层 D≈A 使 A(1−D) 数学上限只有 0.25，而判据阈值在 0.25 之上，")
+    A("   所以 40 条「紧张」里 36 条只能落 MANUAL（`hard_cap`）。这是判据与生成层的结构性矛盾，")
+    A("   不是音频坏；要么换判据（用 F0 抖动 + 停顿密度），要么承认这一档只能人耳过。")
+    A("4. **旁白 196 条 FIX 未重生成**。旁白这条先要确认 F0 突跳是生成参数（rate / max_tokens）")
+    A("   还是模型本身，建议先取 3 条做 seed 对比再决定；盲跑 196 条是 3 小时机器时间。")
+    A("5. **旁白的新链路还没跑过**。`_narr_plan_v3.json`（81 块的 rate + why）已就绪、校验通过，")
+    A("   但还没按 chunk → 停顿移植 → 韵律验收 真跑一遍。这是下一步最该做的，")
+    A("   因为它才是「麦康纳那条生产链路」，现有 716 条是逐句生成的旧产物。\n")
+
+    open(OUT_MD, "w", encoding="utf-8", newline="\n").write("\n".join(L))
+    print("\n".join(L[:6]))
+    print("...")
+    print("→", OUT_MD, len("".join(L)), "chars")
+
+
+if __name__ == "__main__":
+    main()

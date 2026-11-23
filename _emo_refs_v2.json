@@ -1,0 +1,426 @@
+{
+ "Charles": {
+  "excited": [
+   {
+    "path": "G:/_setup\\castle_cues\\c215_2289.8_2293.5.wav",
+    "name": "c000",
+    "z": 3.318,
+    "text": "Menteur! Ton père n'est rien du tout! Il plaît pas à ma mère, elle le "
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c246_2723.6_2726.2.wav",
+    "name": "c000",
+    "z": 2.775,
+    "text": "Tu n'es pas mort. Je suis là."
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c250_2779.8_2781.8.wav",
+    "name": "c000",
+    "z": 2.535,
+    "text": "Tu vas crever, sale Viet!"
+   }
+  ],
+  "angry": [
+   {
+    "path": "G:/_setup\\castle_cues\\c259_2898.4_2904.7.wav",
+    "name": "c000",
+    "z": 1.977,
+    "text": "Il a pissé dans sa culotte, le bébé! J'aurais dû te laisser crever, sa"
+   }
+  ],
+  "soft": [
+   {
+    "path": "G:/_setup\\castle_cues\\c268_2986.9_2988.5.wav",
+    "name": "c000",
+    "z": 2.756,
+    "text": "Maman, j'aurai plus jamais peur."
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c267_2983.2_2984.5.wav",
+    "name": "c000",
+    "z": 2.66,
+    "text": "Mais il pouvait rien m'arriver."
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c395_4917.0_4918.6.wav",
+    "name": "c000",
+    "z": 2.277,
+    "text": "Tu peux plus rien me faire, maintenant."
+   }
+  ],
+  "neutral": [
+   {
+    "path": "G:/_setup\\castle_cues\\c185_2051.8_2056.7.wav",
+    "name": "c000",
+    "z": 1.94,
+    "text": "Ma mère se réveille jamais la nuit. Et demain matin, on sera loin."
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c039_362.4_363.9.wav",
+    "name": "c000",
+    "z": 2.064,
+    "text": "Non. Ça va mieux, maintenant."
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c040_364.5_366.5.wav",
+    "name": "c000",
+    "z": 1.824,
+    "text": "Elle a fait un bébé dans le train."
+   }
+  ]
+ },
+ "Thomas": {
+  "loud": [
+   {
+    "path": "G:/_setup\\castle_cues\\c218_2302.9_2306.4.wav",
+    "name": "c000",
+    "z": 2.531,
+    "text": "Il faut qu'on leur donne de l'argent, une maison, des robes..."
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c217_2298.8_2302.9.wav",
+    "name": "c000",
+    "z": 2.498,
+    "text": "pour que ta mère puisse se marier avec mon père. Les femmes seules fon"
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c310_3529.2_3533.7.wav",
+    "name": "c000",
+    "z": 2.256,
+    "text": "On sera jamais prêts pour ce soir! Allez, on va recommencer."
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c216_2295.1_2298.4.wav",
+    "name": "c000",
+    "z": 2.192,
+    "text": "Il est riche et vous êtes pauvres. C'est pour ça que vous êtes venus,"
+   }
+  ],
+  "calm": [
+   {
+    "path": "G:/_setup\\castle_cues\\c325_3768.4_3773.2.wav",
+    "name": "c000",
+    "z": 2.1,
+    "text": "Je t'ai mis ta récompense. Adieu, Charles."
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c288_3322.2_3327.1.wav",
+    "name": "c000",
+    "z": 2.081,
+    "text": "Je serai le chef du dortoir. Je ferai ce qui me plaît."
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c010_085.0_088.5.wav",
+    "name": "c000",
+    "z": 2.071,
+    "text": "Mais il ne s'agit plus de vivre, il faut régner.\""
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c294_3402.7_3408.2.wav",
+    "name": "c000",
+    "z": 2.007,
+    "text": "Et maintenant, tu vas jurer... jurer de partir d'ici et d'emmener ta m"
+   }
+  ],
+  "scold": [
+   {
+    "path": "G:/_setup\\castle_cues\\c171_1941.6_1945.3.wav",
+    "name": "c000",
+    "z": 2.513,
+    "text": "Je vais aller réveiller mon père et je vais tout lui dire."
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c276_3247.2_3251.9.wav",
+    "name": "c000",
+    "z": 2.074,
+    "text": "Tu me crois, maintenant? Elle dort même pas dans sa chambre."
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c170_1937.6_1939.7.wav",
+    "name": "c000",
+    "z": 2.37,
+    "text": "T'es un menteur et un voleur."
+   }
+  ],
+  "begging": [
+   {
+    "path": "G:/_setup\\castle_cues\\c221_2341.5_2346.9.wav",
+    "name": "c000",
+    "z": 2.153,
+    "text": "Maintenant, tu es mon prisonnier!"
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c240_2561.8_2564.6.wav",
+    "name": "c000",
+    "z": 1.94,
+    "text": "Je demande pardon à Charles pour ce que j'ai fait.\""
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c401_5110.4_5116.8.wav",
+    "name": "c000",
+    "z": 1.826,
+    "text": "Charles!"
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c082_1040.0_1041.9.wav",
+    "name": "c000",
+    "z": 2.064,
+    "text": "La chambre de mon oncle!"
+   }
+  ]
+ },
+ "Joseph": {
+  "defiant": [
+   {
+    "path": "G:/_setup\\refs_cast\\Joseph_defiant_c002.wav",
+    "name": "c002",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Joseph_defiant_c005.wav",
+    "name": "c005",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Joseph_defiant_c030.wav",
+    "name": "c030",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Joseph_defiant_c143.wav",
+    "name": "c143",
+    "z": 0.0,
+    "text": ""
+   }
+  ],
+  "excited": [
+   {
+    "path": "G:/_setup\\refs_cast\\Joseph_excited_c006.wav",
+    "name": "c006",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Joseph_excited_c008.wav",
+    "name": "c008",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Joseph_excited_c028.wav",
+    "name": "c028",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Joseph_excited_c066.wav",
+    "name": "c066",
+    "z": 0.0,
+    "text": ""
+   }
+  ],
+  "nervous": [
+   {
+    "path": "G:/_setup\\refs_cast\\Joseph_nervous_c043.wav",
+    "name": "c043",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Joseph_nervous_c056.wav",
+    "name": "c056",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Joseph_nervous_c058.wav",
+    "name": "c058",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Joseph_nervous_c092.wav",
+    "name": "c092",
+    "z": 0.0,
+    "text": ""
+   }
+  ],
+  "normal": [
+   {
+    "path": "G:/_setup\\refs_cast\\Joseph_normal_c1016.wav",
+    "name": "c1016",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Joseph_normal_c1028.wav",
+    "name": "c1028",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Joseph_normal_c748.wav",
+    "name": "c748",
+    "z": 0.0,
+    "text": ""
+   }
+  ],
+  "wary": [
+   {
+    "path": "G:/_setup\\refs_cast\\Joseph_wary_c013.wav",
+    "name": "c013",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Joseph_wary_c020.wav",
+    "name": "c020",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Joseph_wary_c027.wav",
+    "name": "c027",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Joseph_wary_c035.wav",
+    "name": "c035",
+    "z": 0.0,
+    "text": ""
+   }
+  ],
+  "wronged": [
+   {
+    "path": "G:/_setup\\refs_cast\\Joseph_wronged_c009.wav",
+    "name": "c009",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Joseph_wronged_c017.wav",
+    "name": "c017",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Joseph_wronged_c042.wav",
+    "name": "c042",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Joseph_wronged_c130.wav",
+    "name": "c130",
+    "z": 0.0,
+    "text": ""
+   }
+  ]
+ },
+ "Helena": {
+  "defiant": [
+   {
+    "path": "G:/_setup\\refs_cast\\Helena_defiant_c127.wav",
+    "name": "c127",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Helena_defiant_c390.wav",
+    "name": "c390",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Helena_defiant_c398.wav",
+    "name": "c398",
+    "z": 0.0,
+    "text": ""
+   }
+  ],
+  "excited": [
+   {
+    "path": "G:/_setup\\refs_cast\\Helena_excited_c066.wav",
+    "name": "c066",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Helena_excited_c144.wav",
+    "name": "c144",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Helena_excited_c466.wav",
+    "name": "c466",
+    "z": 0.0,
+    "text": ""
+   }
+  ],
+  "nervous": [
+   {
+    "path": "G:/_setup\\refs_cast\\Helena_nervous_c405.wav",
+    "name": "c405",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Helena_nervous_c441.wav",
+    "name": "c441",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Helena_nervous_c512.wav",
+    "name": "c512",
+    "z": 0.0,
+    "text": ""
+   }
+  ],
+  "wary": [
+   {
+    "path": "G:/_setup\\refs_cast\\Helena_wary_c072.wav",
+    "name": "c072",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Helena_wary_c073.wav",
+    "name": "c073",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Helena_wary_c124.wav",
+    "name": "c124",
+    "z": 0.0,
+    "text": ""
+   }
+  ],
+  "wronged": [
+   {
+    "path": "G:/_setup\\refs_cast\\Helena_wronged_c076.wav",
+    "name": "c076",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Helena_wronged_c083.wav",
+    "name": "c083",
+    "z": 0.0,
+    "text": ""
+   },
+   {
+    "path": "G:/_setup\\refs_cast\\Helena_wronged_c497.wav",
+    "name": "c497",
+    "z": 0.0,
+    "text": ""
+   }
+  ]
+ }
+}

@@ -1,0 +1,749 @@
+{
+ "Charles_angry": {
+  "file": "G:/_setup\\_ref9\\Charles_angry.wav",
+  "dur": 9.22,
+  "parts": [
+   {
+    "path": "G:/_setup\\castle_cues\\c259_2898.4_2904.7.wav",
+    "dur": 6.61,
+    "text": "Il a pissé dans sa culotte, le bébé! J'aurais dû te laisser crever, salaud!"
+   },
+   {
+    "path": "G:/_setup/_cloud_backup/voice_lib/Charles_angry_2.wav",
+    "dur": 2.41,
+    "text": "C'est pas moi. Je vous le jure!"
+   }
+  ],
+  "text": "Il a pissé dans sa culotte, le bébé! J'aurais dû te laisser crever, salaud! C'est pas moi. Je vous le jure!",
+  "short": false,
+  "borrowed_from": []
+ },
+ "Charles_defiant": {
+  "file": "G:/_setup\\_ref9\\Charles_defiant.wav",
+  "dur": 11.05,
+  "parts": [
+   {
+    "path": "G:/_setup/_cloud_backup/voice_lib/Charles_defiant_2.wav",
+    "dur": 6.61,
+    "text": "Il a pissé dans sa culotte, le bébé! J'aurais dû te laisser crever, salaud!"
+   },
+   {
+    "path": "G:/_setup/_cloud_backup/voice_lib/Charles_defiant_1.wav",
+    "dur": 4.24,
+    "text": "Je t'ai dit de disparaître. Tu entends, Thomas? Je ne veux plus jamais te voir!"
+   }
+  ],
+  "text": "Il a pissé dans sa culotte, le bébé! J'aurais dû te laisser crever, salaud! Je t'ai dit de disparaître. Tu entends, Thomas? Je ne veux plus jamais te voir!",
+  "short": false,
+  "borrowed_from": []
+ },
+ "Charles_excited": {
+  "file": "G:/_setup\\_ref9\\Charles_excited.wav",
+  "dur": 11.61,
+  "parts": [
+   {
+    "path": "G:/_setup\\_cloud_backup/voice_lib\\Charles_excited_4.wav",
+    "dur": 4.34,
+    "text": "Eh bien, Thomas, vous oubliez nos accords?"
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c215_2289.8_2293.5.wav",
+    "dur": 3.95,
+    "text": "Menteur! Ton père n'est rien du tout! Il plaît pas à ma mère, elle le déteste!"
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c246_2723.6_2726.2.wav",
+    "dur": 2.92,
+    "text": "Tu n'es pas mort. Je suis là."
+   }
+  ],
+  "text": "Eh bien, Thomas, vous oubliez nos accords? Menteur! Ton père n'est rien du tout! Il plaît pas à ma mère, elle le déteste! Tu n'es pas mort. Je suis là.",
+  "short": false,
+  "borrowed_from": []
+ },
+ "Charles_nervous": {
+  "file": "G:/_setup\\_ref9\\Charles_nervous.wav",
+  "dur": 11.13,
+  "parts": [
+   {
+    "path": "G:/_setup/_cloud_backup/voice_lib/Charles_nervous_1.wav",
+    "dur": 5.11,
+    "text": "T'as raison. Il vaut mieux que je te tue."
+   },
+   {
+    "path": "G:/_setup/_cloud_backup/voice_lib/Charles_nervous_2.wav",
+    "dur": 3.25,
+    "text": "Maman, viens voir. Je crois que c'est lui."
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c040_364.5_366.5.wav",
+    "dur": 2.37,
+    "text": "Elle a fait un bébé dans le train.",
+    "borrowed": true
+   }
+  ],
+  "text": "T'as raison. Il vaut mieux que je te tue. Maman, viens voir. Je crois que c'est lui. Elle a fait un bébé dans le train.",
+  "short": false,
+  "borrowed_from": [
+   "neutral"
+  ]
+ },
+ "Charles_neutral": {
+  "file": "G:/_setup\\_ref9\\Charles_neutral.wav",
+  "dur": 10.68,
+  "parts": [
+   {
+    "path": "G:/_setup\\castle_cues\\c040_364.5_366.5.wav",
+    "dur": 2.37,
+    "text": "Elle a fait un bébé dans le train."
+   },
+   {
+    "path": "G:/_setup\\_cloud_backup/voice_lib\\Charles_neutral_4.wav",
+    "dur": 1.92,
+    "text": "J'en ai pas besoin."
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c039_362.4_363.9.wav",
+    "dur": 1.86,
+    "text": "Non. Ça va mieux, maintenant."
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c268_2986.9_2988.5.wav",
+    "dur": 1.9,
+    "text": "Maman, j'aurai plus jamais peur.",
+    "borrowed": true
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c395_4917.0_4918.6.wav",
+    "dur": 1.84,
+    "text": "Tu peux plus rien me faire, maintenant.",
+    "borrowed": true
+   }
+  ],
+  "text": "Elle a fait un bébé dans le train. J'en ai pas besoin. Non. Ça va mieux, maintenant. Maman, j'aurai plus jamais peur. Tu peux plus rien me faire, maintenant.",
+  "short": false,
+  "borrowed_from": [
+   "soft"
+  ]
+ },
+ "Charles_soft": {
+  "file": "G:/_setup\\_ref9\\Charles_soft.wav",
+  "dur": 10.36,
+  "parts": [
+   {
+    "path": "G:/_setup\\castle_cues\\c268_2986.9_2988.5.wav",
+    "dur": 1.9,
+    "text": "Maman, j'aurai plus jamais peur."
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c395_4917.0_4918.6.wav",
+    "dur": 1.84,
+    "text": "Tu peux plus rien me faire, maintenant."
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c267_2983.2_2984.5.wav",
+    "dur": 1.54,
+    "text": "Mais il pouvait rien m'arriver."
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c040_364.5_366.5.wav",
+    "dur": 2.37,
+    "text": "Elle a fait un bébé dans le train.",
+    "borrowed": true
+   },
+   {
+    "path": "G:/_setup\\_cloud_backup/voice_lib\\Charles_neutral_4.wav",
+    "dur": 1.92,
+    "text": "J'en ai pas besoin.",
+    "borrowed": true
+   }
+  ],
+  "text": "Maman, j'aurai plus jamais peur. Tu peux plus rien me faire, maintenant. Mais il pouvait rien m'arriver. Elle a fait un bébé dans le train. J'en ai pas besoin.",
+  "short": false,
+  "borrowed_from": [
+   "neutral"
+  ]
+ },
+ "Charles_wary": {
+  "file": "G:/_setup\\_ref9\\Charles_wary.wav",
+  "dur": 11.02,
+  "parts": [
+   {
+    "path": "G:/_setup/_cloud_backup/voice_lib/Charles_wary_1.wav",
+    "dur": 5.01,
+    "text": "Il fallait pas me suivre. Et quand on marche, on la boucle."
+   },
+   {
+    "path": "G:/_setup/_cloud_backup/voice_lib/Charles_wary_2.wav",
+    "dur": 2.85,
+    "text": "Je suis plus âgé qu'eux. C'est pas pareil."
+   },
+   {
+    "path": "G:/_setup/_cloud_backup/voice_lib/Charles_wary_3.wav",
+    "dur": 2.76,
+    "text": "Si, c'est vrai."
+   }
+  ],
+  "text": "Il fallait pas me suivre. Et quand on marche, on la boucle. Je suis plus âgé qu'eux. C'est pas pareil. Si, c'est vrai.",
+  "short": false,
+  "borrowed_from": []
+ },
+ "Charles_wronged": {
+  "file": "G:/_setup\\_ref9\\Charles_wronged.wav",
+  "dur": 8.86,
+  "parts": [
+   {
+    "path": "G:/_setup/_cloud_backup/voice_lib/Charles_wronged_2.wav",
+    "dur": 4.67,
+    "text": "De tous les gens, c'est moi que tu préfères?"
+   },
+   {
+    "path": "G:/_setup/_cloud_backup/voice_lib/Charles_wronged_1.wav",
+    "dur": 1.9,
+    "text": "Maman, j'aurai plus jamais peur."
+   },
+   {
+    "path": "G:/_setup/_cloud_backup/voice_lib/Charles_wronged_3.wav",
+    "dur": 1.89,
+    "text": "Maman, j'aurai plus jamais peur."
+   }
+  ],
+  "text": "De tous les gens, c'est moi que tu préfères? Maman, j'aurai plus jamais peur. Maman, j'aurai plus jamais peur.",
+  "short": false,
+  "borrowed_from": []
+ },
+ "Fielding_defiant": {
+  "file": "G:/_setup\\_ref9\\Fielding_defiant.wav",
+  "dur": 12.39,
+  "parts": [
+   {
+    "path": "G:/_setup/refs_cast/Fielding_defiant_c153.wav",
+    "dur": 7.26,
+    "text": "I swear to God, if you tell anyone I'm making this film, I'll smash yo"
+   },
+   {
+    "path": "G:/_setup/refs_cast/Fielding_defiant_c104.wav",
+    "dur": 4.93,
+    "text": "I don't mean another watch. I get to choose how you pay me back, right"
+   }
+  ],
+  "text": "I swear to God, if you tell anyone I'm making this film, I'll smash yo I don't mean another watch. I get to choose how you pay me back, right",
+  "short": false,
+  "borrowed_from": []
+ },
+ "Fielding_excited": {
+  "file": "G:/_setup\\_ref9\\Fielding_excited.wav",
+  "dur": 10.89,
+  "parts": [
+   {
+    "path": "G:/_setup/refs_cast/Fielding_excited_c303.wav",
+    "dur": 4.02,
+    "text": "No. He could if he wanted to, though. He's pretty skill at everything."
+   },
+   {
+    "path": "G:/_setup/refs_cast/Fielding_excited_c730.wav",
+    "dur": 3.71,
+    "text": "Yeah. He's even worse than that bloody French kid."
+   },
+   {
+    "path": "G:/_setup/refs_cast/Fielding_excited_c369.wav",
+    "dur": 2.76,
+    "text": "We've got ten minutes before lessons. Let's go."
+   }
+  ],
+  "text": "No. He could if he wanted to, though. He's pretty skill at everything. Yeah. He's even worse than that bloody French kid. We've got ten minutes before lessons. Let's go.",
+  "short": false,
+  "borrowed_from": []
+ },
+ "Fielding_nervous": {
+  "file": "G:/_setup\\_ref9\\Fielding_nervous.wav",
+  "dur": 9.24,
+  "parts": [
+   {
+    "path": "G:/_setup/refs_cast/Fielding_nervous_c100.wav",
+    "dur": 5.82,
+    "text": "You know, I've been thinking. The watch is nice, but, well, it only re"
+   },
+   {
+    "path": "G:/_setup/refs_cast/Fielding_nervous_c728.wav",
+    "dur": 3.22,
+    "text": "My brother is the worst actor ever."
+   }
+  ],
+  "text": "You know, I've been thinking. The watch is nice, but, well, it only re My brother is the worst actor ever.",
+  "short": false,
+  "borrowed_from": []
+ },
+ "Fielding_wary": {
+  "file": "G:/_setup\\_ref9\\Fielding_wary.wav",
+  "dur": 9.88,
+  "parts": [
+   {
+    "path": "G:/_setup/refs_cast/Fielding_wary_c051.wav",
+    "dur": 3.28,
+    "text": "Doctor said they might have to amputate it off."
+   },
+   {
+    "path": "G:/_setup/refs_cast/Fielding_wary_c301.wav",
+    "dur": 3.17,
+    "text": "their bone goes up through their brain and kills 'em."
+   },
+   {
+    "path": "G:/_setup/refs_cast/Fielding_wary_c049.wav",
+    "dur": 3.03,
+    "text": "Didn't you know? About the torture?"
+   }
+  ],
+  "text": "Doctor said they might have to amputate it off. their bone goes up through their brain and kills 'em. Didn't you know? About the torture?",
+  "short": false,
+  "borrowed_from": []
+ },
+ "Fielding_wronged": {
+  "file": "G:/_setup\\_ref9\\Fielding_wronged.wav",
+  "dur": 12.41,
+  "parts": [
+   {
+    "path": "G:/_setup/refs_cast/Fielding_wronged_c050.wav",
+    "dur": 7.53,
+    "text": "Oh, yeah. The last time she tortured me, I could barely stand up for a"
+   },
+   {
+    "path": "G:/_setup/refs_cast/Fielding_wronged_c046.wav",
+    "dur": 4.68,
+    "text": "But, er, if I do, you, er, might have to give me something in return."
+   }
+  ],
+  "text": "Oh, yeah. The last time she tortured me, I could barely stand up for a But, er, if I do, you, er, might have to give me something in return.",
+  "short": false,
+  "borrowed_from": []
+ },
+ "Helena_defiant": {
+  "file": "G:/_setup\\_ref9\\Helena_defiant.wav",
+  "dur": 15.78,
+  "parts": [
+   {
+    "path": "G:/_setup/refs_cast/Helena_defiant_c127.wav",
+    "dur": 8.0,
+    "text": "Yeah, it was a bit unsettling, to be honest. Well, you're here now. Ex"
+   },
+   {
+    "path": "G:/_setup/refs_cast/Helena_defiant_c390.wav",
+    "dur": 7.58,
+    "text": "it's taken me three hours to get I left home at two I can ask the poli"
+   }
+  ],
+  "text": "Yeah, it was a bit unsettling, to be honest. Well, you're here now. Ex it's taken me three hours to get I left home at two I can ask the poli",
+  "short": false,
+  "borrowed_from": []
+ },
+ "Helena_excited": {
+  "file": "G:/_setup\\_ref9\\Helena_excited.wav",
+  "dur": 16.52,
+  "parts": [
+   {
+    "path": "G:/_setup/refs_cast/Helena_excited_c144.wav",
+    "dur": 8.52,
+    "text": "Did Jerry tell you about me getting a car, Tom? Yes. What do you think"
+   },
+   {
+    "path": "G:/_setup/refs_cast/Helena_excited_c066.wav",
+    "dur": 7.8,
+    "text": "And you can't cook. No. Well, I can a bit, but not really my thing. No"
+   }
+  ],
+  "text": "Did Jerry tell you about me getting a car, Tom? Yes. What do you think And you can't cook. No. Well, I can a bit, but not really my thing. No",
+  "short": false,
+  "borrowed_from": []
+ },
+ "Helena_nervous": {
+  "file": "G:/_setup\\_ref9\\Helena_nervous.wav",
+  "dur": 10.48,
+  "parts": [
+   {
+    "path": "G:/_setup/refs_cast/Helena_nervous_c512.wav",
+    "dur": 4.18,
+    "text": "I still think about that. We had a barbecue that day, didn't we?"
+   },
+   {
+    "path": "G:/_setup/refs_cast/Helena_nervous_c405.wav",
+    "dur": 3.59,
+    "text": "I know Joey but you're allowed a couple glasses aren't you Tonya small"
+   },
+   {
+    "path": "G:/_setup/refs_cast/Helena_nervous_c441.wav",
+    "dur": 2.31,
+    "text": "I don't really smoke normally"
+   }
+  ],
+  "text": "I still think about that. We had a barbecue that day, didn't we? I know Joey but you're allowed a couple glasses aren't you Tonya small I don't really smoke normally",
+  "short": false,
+  "borrowed_from": []
+ },
+ "Helena_wary": {
+  "file": "G:/_setup\\_ref9\\Helena_wary.wav",
+  "dur": 10.88,
+  "parts": [
+   {
+    "path": "G:/_setup/refs_cast/Helena_wary_c124.wav",
+    "dur": 4.15,
+    "text": "Oh. I'm sorry, I've just had to have a cigarette, and I know you don't"
+   },
+   {
+    "path": "G:/_setup/refs_cast/Helena_wary_c072.wav",
+    "dur": 3.99,
+    "text": "I've got my independent, I've got anybody telling me what to do. I mea"
+   },
+   {
+    "path": "G:/_setup/refs_cast/Helena_wary_c073.wav",
+    "dur": 2.34,
+    "text": "It's not all Rosy. I have good days and bad days."
+   }
+  ],
+  "text": "Oh. I'm sorry, I've just had to have a cigarette, and I know you don't I've got my independent, I've got anybody telling me what to do. I mea It's not all Rosy. I have good days and bad days.",
+  "short": false,
+  "borrowed_from": []
+ },
+ "Helena_wronged": {
+  "file": "G:/_setup\\_ref9\\Helena_wronged.wav",
+  "dur": 9.52,
+  "parts": [
+   {
+    "path": "G:/_setup/refs_cast/Helena_wronged_c497.wav",
+    "dur": 4.47,
+    "text": "I do feel a bit guilty, though, but at the end of the day. So"
+   },
+   {
+    "path": "G:/_setup/refs_cast/Helena_wronged_c083.wav",
+    "dur": 2.58,
+    "text": "plastic bags, and shove them under the bed."
+   },
+   {
+    "path": "G:/_setup/refs_cast/Helena_wronged_c076.wav",
+    "dur": 2.07,
+    "text": "a man in? Cost too much."
+   }
+  ],
+  "text": "I do feel a bit guilty, though, but at the end of the day. So plastic bags, and shove them under the bed. a man in? Cost too much.",
+  "short": false,
+  "borrowed_from": []
+ },
+ "Joseph_defiant": {
+  "file": "G:/_setup\\_ref9\\Joseph_defiant.wav",
+  "dur": 10.85,
+  "parts": [
+   {
+    "path": "G:/_setup/refs_cast/Joseph_defiant_c005.wav",
+    "dur": 5.86,
+    "text": "The truth is I made a mistake about Grace right"
+   },
+   {
+    "path": "G:/_setup/refs_cast/Joseph_defiant_c002.wav",
+    "dur": 4.79,
+    "text": "I knew that all my life I'd wanted his embrace"
+   }
+  ],
+  "text": "The truth is I made a mistake about Grace right I knew that all my life I'd wanted his embrace",
+  "short": false,
+  "borrowed_from": []
+ },
+ "Joseph_excited": {
+  "file": "G:/_setup\\_ref9\\Joseph_excited.wav",
+  "dur": 10.32,
+  "parts": [
+   {
+    "path": "G:/_setup/refs_cast/Joseph_excited_c028.wav",
+    "dur": 5.32,
+    "text": "You can love somebody and want to leave them at the same time."
+   },
+   {
+    "path": "G:/_setup/refs_cast/Joseph_excited_c008.wav",
+    "dur": 4.8,
+    "text": "but I feel guilty because I'm happy and she isn't."
+   }
+  ],
+  "text": "You can love somebody and want to leave them at the same time. but I feel guilty because I'm happy and she isn't.",
+  "short": false,
+  "borrowed_from": []
+ },
+ "Joseph_nervous": {
+  "file": "G:/_setup\\_ref9\\Joseph_nervous.wav",
+  "dur": 13.29,
+  "parts": [
+   {
+    "path": "G:/_setup/refs_cast/Joseph_nervous_c043.wav",
+    "dur": 2.84,
+    "text": "And she never really forgave me for not being him."
+   },
+   {
+    "path": "G:/_setup/refs_cast/Joseph_nervous_c056.wav",
+    "dur": 2.7,
+    "text": "I think you want something I haven't got."
+   },
+   {
+    "path": "G:/_setup/refs_cast/Joseph_nervous_c058.wav",
+    "dur": 2.19,
+    "text": "I'm no good for you, Grace."
+   },
+   {
+    "path": "G:/_setup/refs_cast/Joseph_wronged_c042.wav",
+    "dur": 4.96,
+    "text": "She was looking at me as if she was sorry for me.",
+    "borrowed": true
+   }
+  ],
+  "text": "And she never really forgave me for not being him. I think you want something I haven't got. I'm no good for you, Grace. She was looking at me as if she was sorry for me.",
+  "short": false,
+  "borrowed_from": [
+   "wronged"
+  ]
+ },
+ "Joseph_normal": {
+  "file": "G:/_setup\\_ref9\\Joseph_normal.wav",
+  "dur": 13.39,
+  "parts": [
+   {
+    "path": "G:/_setup/refs_cast/Joseph_normal_c1028.wav",
+    "dur": 3.52,
+    "text": "It's by Henri King on the death of his wife."
+   },
+   {
+    "path": "G:/_setup/refs_cast/Joseph_normal_c748.wav",
+    "dur": 2.49,
+    "text": "It's all contactless now, yes."
+   },
+   {
+    "path": "G:/_setup/refs_cast/Joseph_normal_c1016.wav",
+    "dur": 1.82,
+    "text": "My father was a reserved man."
+   },
+   {
+    "path": "G:/_setup/refs_cast/Joseph_wronged_c042.wav",
+    "dur": 4.96,
+    "text": "She was looking at me as if she was sorry for me.",
+    "borrowed": true
+   }
+  ],
+  "text": "It's by Henri King on the death of his wife. It's all contactless now, yes. My father was a reserved man. She was looking at me as if she was sorry for me.",
+  "short": false,
+  "borrowed_from": [
+   "wronged"
+  ]
+ },
+ "Joseph_wary": {
+  "file": "G:/_setup\\_ref9\\Joseph_wary.wav",
+  "dur": 11.35,
+  "parts": [
+   {
+    "path": "G:/_setup/refs_cast/Joseph_wary_c020.wav",
+    "dur": 7.09,
+    "text": "All it took was Angela's hand on my arm, her touch."
+   },
+   {
+    "path": "G:/_setup/refs_cast/Joseph_wary_c035.wav",
+    "dur": 4.06,
+    "text": "That makes me feel, well, not much good really."
+   }
+  ],
+  "text": "All it took was Angela's hand on my arm, her touch. That makes me feel, well, not much good really.",
+  "short": false,
+  "borrowed_from": []
+ },
+ "Joseph_wronged": {
+  "file": "G:/_setup\\_ref9\\Joseph_wronged.wav",
+  "dur": 9.11,
+  "parts": [
+   {
+    "path": "G:/_setup/refs_cast/Joseph_wronged_c042.wav",
+    "dur": 4.96,
+    "text": "She was looking at me as if she was sorry for me."
+   },
+   {
+    "path": "G:/_setup/refs_cast/Joseph_wronged_c017.wav",
+    "dur": 3.95,
+    "text": "Yes, it's not easy to explain."
+   }
+  ],
+  "text": "She was looking at me as if she was sorry for me. Yes, it's not easy to explain.",
+  "short": false,
+  "borrowed_from": []
+ },
+ "Thomas_begging": {
+  "file": "G:/_setup\\_ref9\\Thomas_begging.wav",
+  "dur": 12.54,
+  "parts": [
+   {
+    "path": "G:/_setup\\castle_cues\\c401_5110.4_5116.8.wav",
+    "dur": 6.67,
+    "text": "Charles!"
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c221_2341.5_2346.9.wav",
+    "dur": 5.66,
+    "text": "Maintenant, tu es mon prisonnier!"
+   }
+  ],
+  "text": "Charles! Maintenant, tu es mon prisonnier!",
+  "short": false,
+  "borrowed_from": []
+ },
+ "Thomas_calm": {
+  "file": "G:/_setup\\_ref9\\Thomas_calm.wav",
+  "dur": 11.17,
+  "parts": [
+   {
+    "path": "G:/_setup\\castle_cues\\c294_3402.7_3408.2.wav",
+    "dur": 5.81,
+    "text": "Et maintenant, tu vas jurer... jurer de partir d'ici et d'emmener ta mère avec toi."
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c288_3322.2_3327.1.wav",
+    "dur": 5.17,
+    "text": "Je serai le chef du dortoir. Je ferai ce qui me plaît."
+   }
+  ],
+  "text": "Et maintenant, tu vas jurer... jurer de partir d'ici et d'emmener ta mère avec toi. Je serai le chef du dortoir. Je ferai ce qui me plaît.",
+  "short": false,
+  "borrowed_from": []
+ },
+ "Thomas_defiant": {
+  "file": "G:/_setup\\_ref9\\Thomas_defiant.wav",
+  "dur": 10.28,
+  "parts": [
+   {
+    "path": "G:/_setup/_cloud_backup/voice_lib/Thomas_defiant_1.wav",
+    "dur": 5.75,
+    "text": "Mesdames et messieurs, bonsoir. Non. Attends. Je recommence."
+   },
+   {
+    "path": "G:/_setup/_cloud_backup/voice_lib/Thomas_defiant_2.wav",
+    "dur": 4.33,
+    "text": "pour que ta mère puisse se marier avec mon père. Les femmes seules font ça."
+   }
+  ],
+  "text": "Mesdames et messieurs, bonsoir. Non. Attends. Je recommence. pour que ta mère puisse se marier avec mon père. Les femmes seules font ça.",
+  "short": false,
+  "borrowed_from": []
+ },
+ "Thomas_excited": {
+  "file": "G:/_setup\\_ref9\\Thomas_excited.wav",
+  "dur": 10.87,
+  "parts": [
+   {
+    "path": "G:/_setup/_cloud_backup/voice_lib/Thomas_excited_1.wav",
+    "dur": 4.92,
+    "text": "Personne te croira! Personne n'écoute les nouveaux. Un nouveau ne peut même pas parler"
+   },
+   {
+    "path": "G:/_setup/_cloud_backup/voice_lib/Thomas_defiant_1.wav",
+    "dur": 5.75,
+    "text": "Mesdames et messieurs, bonsoir. Non. Attends. Je recommence.",
+    "borrowed": true
+   }
+  ],
+  "text": "Personne te croira! Personne n'écoute les nouveaux. Un nouveau ne peut même pas parler Mesdames et messieurs, bonsoir. Non. Attends. Je recommence.",
+  "short": false,
+  "borrowed_from": [
+   "defiant"
+  ]
+ },
+ "Thomas_loud": {
+  "file": "G:/_setup\\_ref9\\Thomas_loud.wav",
+  "dur": 9.8,
+  "parts": [
+   {
+    "path": "G:/_setup\\_cloud_backup/voice_lib\\Thomas_loud_5.wav",
+    "dur": 4.84,
+    "text": "Tu sais ce qui va arriver? Mon père va te mettre dehors."
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c310_3529.2_3533.7.wav",
+    "dur": 4.76,
+    "text": "On sera jamais prêts pour ce soir! Allez, on va recommencer."
+   }
+  ],
+  "text": "Tu sais ce qui va arriver? Mon père va te mettre dehors. On sera jamais prêts pour ce soir! Allez, on va recommencer.",
+  "short": false,
+  "borrowed_from": []
+ },
+ "Thomas_nervous": {
+  "file": "G:/_setup\\_ref9\\Thomas_nervous.wav",
+  "dur": 9.14,
+  "parts": [
+   {
+    "path": "G:/_setup/_cloud_backup/voice_lib/Thomas_nervous_1.wav",
+    "dur": 5.08,
+    "text": "Mais t'es fou! Beaucoup plus! Je commence à avoir des crampes."
+   },
+   {
+    "path": "G:/_setup/_cloud_backup/voice_lib/Thomas_nervous_2.wav",
+    "dur": 3.86,
+    "text": "Vite, Charles! Je n'en peux plus!"
+   }
+  ],
+  "text": "Mais t'es fou! Beaucoup plus! Je commence à avoir des crampes. Vite, Charles! Je n'en peux plus!",
+  "short": false,
+  "borrowed_from": []
+ },
+ "Thomas_scold": {
+  "file": "G:/_setup\\_ref9\\Thomas_scold.wav",
+  "dur": 9.27,
+  "parts": [
+   {
+    "path": "G:/_setup\\castle_cues\\c276_3247.2_3251.9.wav",
+    "dur": 5.01,
+    "text": "Tu me crois, maintenant? Elle dort même pas dans sa chambre."
+   },
+   {
+    "path": "G:/_setup\\castle_cues\\c171_1941.6_1945.3.wav",
+    "dur": 4.07,
+    "text": "Je vais aller réveiller mon père et je vais tout lui dire."
+   }
+  ],
+  "text": "Tu me crois, maintenant? Elle dort même pas dans sa chambre. Je vais aller réveiller mon père et je vais tout lui dire.",
+  "short": false,
+  "borrowed_from": []
+ },
+ "Thomas_wary": {
+  "file": "G:/_setup\\_ref9\\Thomas_wary.wav",
+  "dur": 10.35,
+  "parts": [
+   {
+    "path": "G:/_setup/_cloud_backup/voice_lib/Thomas_wary_4.wav",
+    "dur": 4.62,
+    "text": "Tu sais ce qu'on fait aux nouveaux? On les enferme à la cave."
+   },
+   {
+    "path": "G:/_setup/_cloud_backup/voice_lib/Thomas_wary_1.wav",
+    "dur": 3.45,
+    "text": "Ils te mettront avec moi pour te faire plaisir."
+   },
+   {
+    "path": "G:/_setup/_cloud_backup/voice_lib/Thomas_wary_3.wav",
+    "dur": 1.88,
+    "text": "Mais il y a un truc que tu sais pas."
+   }
+  ],
+  "text": "Tu sais ce qu'on fait aux nouveaux? On les enferme à la cave. Ils te mettront avec moi pour te faire plaisir. Mais il y a un truc que tu sais pas.",
+  "short": false,
+  "borrowed_from": []
+ },
+ "Thomas_wronged": {
+  "file": "G:/_setup\\_ref9\\Thomas_wronged.wav",
+  "dur": 11.16,
+  "parts": [
+   {
+    "path": "G:/_setup/_cloud_backup/voice_lib/Thomas_wronged_1.wav",
+    "dur": 5.77,
+    "text": "Je sens que sans vous, je ne saurais plus vivre."
+   },
+   {
+    "path": "G:/_setup/_cloud_backup/voice_lib/Thomas_wronged_3.wav",
+    "dur": 5.19,
+    "text": "Et si tu renies ton serment... tu vas en enfer."
+   }
+  ],
+  "text": "Je sens que sans vous, je ne saurais plus vivre. Et si tu renies ton serment... tu vas en enfer.",
+  "short": false,
+  "borrowed_from": []
+ }
+}

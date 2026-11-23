@@ -1,0 +1,77 @@
+# =============================================================================
+# 白名单模式：默认全忽略，只放行「源码 / 文档 / 小台账」
+#
+# 为什么这样写：G:/_setup 是 105GB 的工作现场（models 24G、datasets 17G、
+# _audio_ch123 3.8G、575 个实验产物目录）。整目录进 git 会直接爆掉，
+# 而且电影切片/配音音频有版权，不能进公开仓库。
+# 能用脚本重建的东西（音频、波形页、缓存、venv）一律不进。
+#
+# 新增脚本：放在根目录的 *.py 自动被跟踪，不需要改这个文件。
+# 新增子模块：在下面「自研子模块」段加一条，或直接 `git add -f`。
+# =============================================================================
+/*
+
+# --- 根级源码 / 文档 / 台账 ---
+!/.gitignore
+!/.gitattributes
+!/*.py
+!/*.md
+!/*.jsonl
+!/*.sh
+!/*.bat
+!/*.toml
+!/*.cfg
+!/*.ini
+
+# --- 自研子模块（dialog_gate.py 依赖 emo_bench）---
+!/emo_bench/
+/emo_bench/*
+!/emo_bench/*.py
+!/emo_bench/**/*.py
+!/emo_bench/*.md
+!/rag/
+/rag/*
+!/rag/*.py
+!/rag/*.md
+!/whistress_tool/
+/whistress_tool/*
+!/whistress_tool/*.py
+!/whistress_tool/**/*.py
+
+# --- 判据/台账：少数必需的小 json（单文件 <200KB）---
+!/_ref9/
+/_ref9/*
+!/_ref9/_index_srt.json
+!/_emo_refs_v2.json
+!/_bg_map_v2.json
+!/_selftest.json
+
+# --- 显式排除：即使上面误放行也不要 ---
+/.secrets/
+/*.key
+# 第三方安装脚本（pip 自带，2MB 一个，不占仓库）
+/get-pip.py
+/_getpip.py
+*.wav
+*.mp3
+*.flac
+*.m4a
+*.ogg
+*.opus
+*.rnnn
+*.onnx
+*.pt
+*.pth
+*.safetensors
+*.ckpt
+*.bin
+*.mp4
+*.mkv
+*.html
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv/
+venv/
+node_modules/
