@@ -2,26 +2,19 @@
 chcp 65001 >nul
 cd /d G:\_setup
 echo ============================================================
-echo  MintReader TTS - push to GitHub
-echo  repo: https://github.com/a2074629867-crypto/mintreader-tts-pipeline
+echo  G:\_setup  -  github.com/a2074629867-crypto/zk7q2m9xvp
 echo ============================================================
 echo.
-echo [1/3] checking remote ...
-git remote set-url origin https://github.com/a2074629867-crypto/mintreader-tts-pipeline.git
-echo [2/3] local branch / commits:
-git log --oneline
+echo First push is done. Credentials are already stored in Windows.
+echo Double-click this file later to push new changes.
 echo.
-echo [3/3] pushing (a browser window may pop up for GitHub login) ...
-git push -u origin main
+git add -A
+git commit -m "update"
+git push
+echo.
 if errorlevel 1 (
-  echo.
-  echo PUSH FAILED.
-  echo   - if repo does not exist yet: create it at https://github.com/new
-  echo     name = mintreader-tts-pipeline , Public , do NOT add README
-  echo   - if login failed: a credential window should pop up; sign in and run again
+  echo PUSH FAILED - see message above
 ) else (
-  echo.
-  echo OK - view it at https://github.com/a2074629867-crypto/mintreader-tts-pipeline
+  echo DONE
 )
-echo.
 pause
