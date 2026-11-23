@@ -23,7 +23,11 @@ import os
 import shutil
 import sys
 
-ROOT = "G:/_setup"
+# 嵌入式 Python（python310._pth）不会自动加脚本目录，必须先手动加
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _paths as _P      # 路径集中管理：本机默认 G:/_setup，云上按 MR_ROOT
+
+ROOT = _P.ROOT
 sys.path.insert(0, ROOT)
 
 

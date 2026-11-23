@@ -29,9 +29,10 @@ import soundfile as sf
 from numpy.fft import rfft
 from parselmouth.praat import call
 
-sys.path.insert(0, "G:/_setup")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _paths as _P
 
-ROOT = "G:/_setup"
+ROOT = _P.ROOT
 AUDIO = os.path.join(ROOT, "_audio_ch123", "out_paused")
 WIN = np.hanning(1024)
 

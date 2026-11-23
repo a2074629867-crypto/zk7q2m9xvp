@@ -28,8 +28,10 @@ import time
 import numpy as np
 import soundfile as sf
 
-sys.path.insert(0, "G:/_setup")
-ROOT = "G:/_setup"
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _paths as P
+
+ROOT = P.ROOT
 SR = 48000
 FRAME_MS = 20
 
@@ -86,7 +88,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--ids", required=True)
     ap.add_argument("--out", default=os.path.join(ROOT, "_sweep", "short2"))
-    ap.add_argument("--threads", type=int, default=2)
+    ap.add_argument("--threads", type=int, default=P.ACPP_THREADS)
     ap.add_argument("--seed", type=int, default=42)
     a = ap.parse_args()
 
@@ -119,11 +121,11 @@ def main():
             if not (os.path.exists(tmp) and os.path.getsize(tmp) > 50000):
                 mtok = max(120, min(900, int(len(gen_text.split()) * 12 + 120)))
                 cmd = [R9.ACPP, "--task", "tts", "--family", "dots_tts", "--model", R9.MODEL,
-                       "--backend", "vulkan", "--threads", str(a.threads),
+                       "--backend", P.ACPP_BACKEND, "--threads", str(a.threads),
                        "--voice-ref", ref, "--reference-text", "",
                        "--text", gen_text, "--seed", str(a.seed), "--out", tmp,
-                       "--request-option", "max_tokens=%d" % mtok,
-                       "--session-option", "dots_tts.mem_saver=true", "--metrics"]
+                       "--request-option", "max_tokens=%d" % mtok]
+                cmd += P.mem_saver_args() + ["--metrics"]
                 subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8",
                                errors="replace", cwd=R9.ACPP_DIR, timeout=1800)
             if not (os.path.exists(tmp) and os.path.getsize(tmp) > 50000):

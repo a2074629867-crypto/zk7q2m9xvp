@@ -33,7 +33,11 @@ import numpy as np
 import torch
 import torchaudio
 
-ROOT = "G:/_setup"
+# 本机是嵌入式 Python（G:/Python310/python310._pth），**不会**自动把脚本目录加进 sys.path
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _paths as _P      # 路径集中管理：本机默认 G:/_setup，云上按 MR_ROOT
+
+ROOT = _P.ROOT
 MODEL = "facebook/wav2vec2-base-960h"
 FRAME_MS = 20.0
 

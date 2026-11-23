@@ -3471,3 +3471,60 @@ repick 跑完自动接两步，不需要人在场：
 2. `_apply_picks.py --apply` —— 把 `_loop_pick/` 择优结果写回 + 补 ASR / 停顿 / 页面
 
 顺序不能换：两步都会重建页面，apply 必须最后跑。看门狗：连续 40 分钟无新增 take 判卡死。
+
+## 2026-11-24 02:2x ★更正：「云上跑不了 TTS」是错的，云 GPU 完全能跑，且有持久云硬盘
+
+用户反驳：「云上怎么就跑不了 TTS 了？绝对能跑的，绝对有永久硬盘固定的，云算力本来就这样功能啊」
+——**他是对的。我上一条结论作废。**
+
+### 一、官方文档事实（腾讯云）
+
+| 项 | 官方口径 | 来源 |
+|---|---|---|
+| 产品 | HAI 高性能应用服务：基于 GPU/NPU 异构算力的 AI 应用平台，交付「算力+云硬盘+带宽+框架」的实例 | 文档 1721/101024 |
+| 云硬盘 | 每个算力套餐**免费配 80GB**（30GB 系统盘 + 50GB 数据盘），超出部分按量计费 | 计费拆解文 |
+| 关机 | **关机不计费**（算力与网络归零），**临时关机保留数据盘**；关机 15 天内免费额度内不计费，超 15 天整块盘开始计费 | 同上 |
+| 价格 | 基础型 T4 16G **1.2 元/小时**；进阶型 V100 32G **3.6 元/小时**；月付日常 864 / 2592 元，活动 3 折 259.2 / 777.6 | 官方活动页 + 报价整理 |
+| 环境 | 预置 PyTorch 模板（Linux）、JupyterLab、Terminal、Cloud Studio WebIDE；驱动与 CUDA 不用自己装 | 文档 1081/106187 |
+
+⇒ 「永久硬盘固定」这条完全成立：80GB 云硬盘随套餐存在，关机也在，只有「关机 >15 天」才开始对整块盘计费。
+
+### 二、我错在哪（两层错误）
+
+1. **把「手里这个二进制」当成「能力边界」**。
+   `audiocpp_cli.exe --version` = `audio.cpp 0.9.1 / build Release, msvc 19.44 / Windows AMD64 / backends: cpu,vulkan`。
+   我看到 Windows+msvc 就推断「Linux 没有」，没去查上游。上游（pingdotgg/audio.cpp）实际提供：
+   - **Ubuntu x64 预编译**（CPU / Vulkan）
+   - **Linux CUDA 源码构建**：`scripts/build_linux.sh --backend cuda --target audiocpp_cli`（GCC 13+ / CUDA Toolkit）
+   - **Docker CUDA 与 CPU 镜像**（CLI 与 server 都有）
+   - CLI 本身就有 `--backend cpu|cuda|hip|rocm|vulkan|metal`
+2. **把「RX580 8G Vulkan OOM」外推成「云也不行」**。
+   那是 8GB 显存 + Vulkan 后端 + mem_saver 的组合限制。T4 16G 走 CUDA 时显存翻倍，`--threads 2 + mem_saver=true` 这套将就手段不需要。
+
+### 三、真正的迁移成本（不在 TTS，在判据链）
+
+上传清单（本地实测）：
+
+| 内容 | 体积 |
+|---|---|
+| `DotTTS-Edit-GGUF/dots-tts-edit-q8_0.gguf` | 2.8 GB |
+| `models/ms/iic/emotion2vec_plus_large`（情绪闸） | 1.9 GB |
+| `models/sv`（声纹闸） | 772 MB |
+| `_audio_ch123/out` 成品 | 503 MB |
+| `_ref9` 参考 | 34 MB |
+| 仓库（1386 文件） | 11.7 MB |
+| 合计 | **≈6 GB**（80GB 免费盘毫无压力） |
+
+依赖全部有 Linux wheel：onnxruntime 1.23.2 / torch 2.5.1+cpu（云上换 cu12x）/ transformers 4.50.3 /
+faster-whisper 1.2.1 / praat-parselmouth 0.4.7 / librosa 0.9.2 / demucs 4.1.0。
+
+要改的硬编码：`dialog_gate.py` 里 `G:/_setup/models/ms/iic/emotion2vec_plus_large`、
+`_regen9.py` 的 `ACPP_DIR`（Windows 路径 + `.exe`）、`MODEL`（E:/tts-models）。
+
+### 四、算账（本机实测速度外推）
+
+本机：413 任务 = 346 min ⇒ **0.84 min/条**（RX580 Vulkan）。
+67 条错配重生成：本机约 56 min；T4+CUDA 预计 2~4 倍速 ⇒ 20~30 min，成本 **≈0.5 元**。
+全库 413 条重跑：本机 5.8h；T4 约 2~3h，成本 **≈3 元**。
+
+⇒ 云上不是「跑不了」，是**比自己熬 6 小时还便宜**。

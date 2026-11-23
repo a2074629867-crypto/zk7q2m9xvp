@@ -10,11 +10,13 @@
 import os, sys, json, argparse, collections
 import numpy as np
 
-sys.path.insert(0, "G:/_setup")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _paths as _P
+
 from sv_onnx import SV
 
-LIB = "G:/_setup/_emo_refs.json"
-BG = "G:/_setup/out_sv/cues_znorm2.json"
+LIB = _P.EMO_LIB
+BG = _P.BG_Z
 
 
 def _zdict(keys, z):
@@ -66,14 +68,15 @@ class EmoVoice:
         # 缓存：393 条背景 embedding 要 35–40s，日常当闸门用太慢。
         # 指纹 = 模板条数 + 背景条数 + 背景首末路径 + 两个库的路径，
         # 换片（lib/bg 变了）必须重算，否则会拿上一片的 μ/σ 去归一化这一片。
-        cache = "G:/_setup/out_sv/znorm_cache.json"
+        cache = os.path.join(_P.ROOT, "out_sv", "znorm_cache.json")
         key = "%d|%d|%s|%s|%s|%s" % (len(self.keys), len(paths),
                                      paths[0] if paths else "", paths[-1] if paths else "",
                                      os.path.basename(self.lib_path),
                                      os.path.basename(self.bg_path))
         # 不同片各存一份缓存，否则换片会覆盖上一片的 μ/σ（下次换回来又要重算 40s）
         import hashlib
-        cache = "G:/_setup/out_sv/znorm_cache_%s.json" % hashlib.md5(key.encode()).hexdigest()[:10]
+        cache = os.path.join(_P.ROOT, "out_sv",
+                             "znorm_cache_%s.json" % hashlib.md5(key.encode()).hexdigest()[:10])
         if os.path.exists(cache):
             try:
                 d = json.load(open(cache, encoding="utf-8"))
@@ -123,8 +126,8 @@ class EmoVoice:
             bg = json.load(open(p, encoding="utf-8"))
             paths = [r["path"] for r in bg if os.path.exists(r["path"])]
             sig.append("%s:%s:%d" % (role, os.path.basename(p), len(paths)))
-            cache = "G:/_setup/out_sv/znorm_map_%s.json" % hashlib.md5(
-                ("|".join(sig) + "|" + self.lib_path).encode()).hexdigest()[:10]
+            cache = os.path.join(_P.ROOT, "out_sv", "znorm_map_%s.json" % hashlib.md5(
+                ("|".join(sig) + "|" + self.lib_path).encode()).hexdigest()[:10])
             if os.path.exists(cache):
                 try:
                     d = json.load(open(cache, encoding="utf-8"))

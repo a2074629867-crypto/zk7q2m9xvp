@@ -27,10 +27,17 @@ import time
 
 import soundfile as sf
 
-ACPP_DIR = r"C:\Users\86178\WorkBuddy\2026-10-05-00-50-22\reader\_tts_lab\acpp"
-ACPP = os.path.join(ACPP_DIR, "audiocpp_cli.exe")
-MODEL = "E:/tts-models/acpp/DotTTS-Edit-GGUF"
-ROOT = "G:/_setup"
+# 路径与后端集中到 _paths.py：本机 Windows 默认值不变，云上（Linux/CUDA）只改环境变量。
+try:
+    import _paths as P
+except ImportError:
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import _paths as P
+
+ACPP_DIR = P.ACPP_DIR
+ACPP = P.ACPP
+MODEL = P.MODEL
+ROOT = P.ROOT
 PLAN = os.path.join(ROOT, "_dlg_plan_v2.jsonl")
 IDX = os.path.join(ROOT, "_ref9", "_index_srt.json")
 
@@ -105,7 +112,7 @@ def main():
     ap.add_argument("--limit", type=int, default=0, help="0=全部")
     ap.add_argument("--seeds", default="42")
     ap.add_argument("--out", default=os.path.join(ROOT, "_sweep", "cand9"))
-    ap.add_argument("--threads", type=int, default=2)
+    ap.add_argument("--threads", type=int, default=P.ACPP_THREADS)
     ap.add_argument("--tag", default="")
     ap.add_argument("--ref", default="", help="强制参考（A/B 试验用）")
     ap.add_argument("--ref-text", default="", help="配合 --ref 的参考文本")
@@ -154,11 +161,12 @@ def main():
                 skip += 1
                 continue
             cmd = [ACPP, "--task", "tts", "--family", "dots_tts", "--model", MODEL,
-                   "--backend", "vulkan", "--threads", str(a.threads),
+                   "--backend", P.ACPP_BACKEND, "--threads", str(a.threads),
                    "--voice-ref", ref, "--reference-text", rtext or "",
                    "--text", text, "--seed", str(s), "--out", out,
-                   "--request-option", "max_tokens=%d" % mtok(len(text.split())),
-                   "--session-option", "dots_tts.mem_saver=true", "--metrics"]
+                   "--request-option", "max_tokens=%d" % mtok(len(text.split()))]
+            # mem_saver 是本机 8G 显存的将就手段；云上 16G/32G 关掉更快（_paths 控制）
+            cmd += P.mem_saver_args() + ["--metrics"]
             try:
                 r = subprocess.run(cmd, capture_output=True, text=True,
                                    encoding="utf-8", errors="replace",

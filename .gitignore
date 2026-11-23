@@ -46,6 +46,11 @@
 !/_bg_map_v2.json
 !/_selftest.json
 
+# --- 少量必需的小 txt（不放行 *.txt，根目录有 70+ 个调试日志会被一起带进来）---
+!/requirements-cloud.txt
+!/_notxt_ids.txt
+!/_deadref_ids.txt
+
 # --- 显式排除：即使上面误放行也不要 ---
 /.secrets/
 /*.key
@@ -78,3 +83,4 @@ node_modules/
 
 # 仓库不公开说明文档（用户要求：先只传文件，等完善后再写）
 /README.md
+/CLOUD.md

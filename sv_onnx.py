@@ -14,7 +14,11 @@ from math import gcd
 import onnxruntime as ort
 from torchaudio.compliance import kaldi
 
-ROOT = "G:/_setup/models/sv_hub"
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _paths as _P
+
+ROOT = _P.SV_ONNX_DIR
 MODELS = {
     "r293": os.path.join(ROOT, "voxceleb_resnet293_LM.onnx"),
     "r34": os.path.join(ROOT, "voxceleb_resnet34_LM.onnx"),

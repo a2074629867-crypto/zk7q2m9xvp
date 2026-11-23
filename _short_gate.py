@@ -24,11 +24,12 @@ import json
 import os
 import sys
 
-sys.path.insert(0, "G:/_setup")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _paths as _P
 
 from wlevel_flags import coverage
 
-ROOT = "G:/_setup"
+ROOT = _P.ROOT
 AUDIO = os.path.join(ROOT, "_audio_ch123", "out_paused")
 PLAN = os.path.join(ROOT, "_dlg_plan_v2_paused.jsonl")
 

@@ -28,12 +28,17 @@ import io
 import json
 import os
 import subprocess
+import sys
 import time
 
-ACPP_DIR = r"C:\Users\86178\WorkBuddy\2026-10-05-00-50-22\reader\_tts_lab\acpp"
-ACPP = os.path.join(ACPP_DIR, "audiocpp_cli.exe")
-MODEL = "E:/tts-models/acpp/DotTTS-Edit-GGUF"
-ROOT = "G:/_setup"
+# 路径与后端集中到 _paths.py（本机默认值不变，云上只改环境变量）
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _paths as P
+
+ACPP_DIR = P.ACPP_DIR
+ACPP = P.ACPP
+MODEL = P.MODEL
+ROOT = P.ROOT
 PLAN = os.path.join(ROOT, "_dlg_plan_v2.jsonl")
 IDX = os.path.join(ROOT, "_ref9", "_index_srt.json")
 
@@ -113,11 +118,11 @@ def main():
             continue
         text = row.get("text_src") or row["text"]
         cmd = [ACPP, "--task", "tts", "--family", "dots_tts", "--model", MODEL,
-               "--backend", "vulkan", "--threads", str(a.threads),
+               "--backend", P.ACPP_BACKEND, "--threads", str(a.threads),
                "--voice-ref", ref, "--reference-text", rtext or "",
                "--text", text, "--seed", str(a.seed), "--out", out,
-               "--request-option", "max_tokens=%d" % mtok(len(text.split())),
-               "--session-option", "dots_tts.mem_saver=true", "--metrics"]
+               "--request-option", "max_tokens=%d" % mtok(len(text.split()))]
+        cmd += P.mem_saver_args() + ["--metrics"]
         try:
             r = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8",
                                errors="replace", cwd=ACPP_DIR, timeout=1800)

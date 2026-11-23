@@ -49,10 +49,13 @@ import collections
 
 import numpy as np
 
-sys.path.insert(0, "G:/setup")
-sys.path.insert(0, "G:/_setup")
-sys.path.insert(0, "G:/_setup/emo_bench")
-sys.path.insert(0, "G:/voice_lib")
+# 路径集中到 _paths.py：本机保持 G:/_setup 原值，云上按 MR_ROOT 解析
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _paths as P
+
+for _p in (P.ROOT, os.path.join(P.ROOT, "emo_bench"), "G:/voice_lib"):
+    if _p and os.path.isdir(_p) and _p not in sys.path:
+        sys.path.insert(0, _p)
 
 from chain_check import EmoVoice
 import verdict as V
@@ -118,7 +121,7 @@ def _parse_bg_map(s):
     return out or None
 
 
-def load_ref_stats():    return json.load(open("G:/_setup/emo_bench/out/ref_stats.json", encoding="utf-8"))
+def load_ref_stats():    return json.load(open(P.REF_STATS, encoding="utf-8"))
 
 
 def audio_stats(path):
@@ -464,7 +467,7 @@ def gate_emotion(wav, emo, stats, vox, e2v=None, ref_emo=None, dur=None, who=Non
     else:
         if e2v is None:
             import ser as S
-            e2v = S.E2V("G:/_setup/models/ms/iic/emotion2vec_plus_large")
+            e2v = S.E2V(P.EMO2VEC)
         sc = e2v.score(wav) or {}
         val = float(sc.get("厌恶/disgusted", 0.0))
         extra = {"top": sc.get("_top"), "angry": round(float(sc.get("生气/angry", 0)), 3)}
@@ -659,8 +662,8 @@ def main():
     ap.add_argument("--out")
     ap.add_argument("--limit", type=int, default=0)
     # 换片/做对照实验要能换库，不能只跑写死的那一套
-    ap.add_argument("--lib", default="G:/_setup/_emo_refs.json", help="声纹模板库 json")
-    ap.add_argument("--bg", default="G:/_setup/out_sv/cues_znorm2.json", help="Z-norm 背景集 json")
+    ap.add_argument("--lib", default=P.EMO_LIB, help="声纹模板库 json")
+    ap.add_argument("--bg", default=P.BG_Z, help="Z-norm 背景集 json")
     ap.add_argument("--bg-map", default="",
                     help="按角色分域的背景集：Charles=bg1.json,Joseph=bg2.json。多片合库时必须给，"
                          "否则一个域的 μ/σ 会把别的片的角色放大（PASS 38→17 就是这么来的）")
