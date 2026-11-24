@@ -118,6 +118,14 @@ def main():
     ap.add_argument("--ref-text", default="", help="配合 --ref 的参考文本")
     ap.add_argument("--strip-end-punct", action="store_true",
                     help="去掉正文引号与句末句号/省略号（极短句 ‘No.’ 会生成空文件）")
+    ap.add_argument("--mtok-bonus", type=int, default=0,
+                    help="在词数预估的 max_tokens 上加多少（查截断用）")
+    ap.add_argument("--mtok-fixed", type=int, default=0,
+                    help="直接用固定 max_tokens（0=按词数算）")
+    ap.add_argument("--speaking-rate", type=float, default=0.0,
+                    help="透传 CLI 的 --speaking-rate（0=不传，用模型默认）")
+    ap.add_argument("--target-dur", type=float, default=0.0,
+                    help="透传 --target-duration-seconds（0=不传）")
     ap.add_argument("--no-ref-text", action="store_true",
                     help="显式不传 reference-text（测「参考文本错配是否导致 lead」）")
     ap.add_argument("--ref-dir", default="",
@@ -164,7 +172,13 @@ def main():
                    "--backend", P.ACPP_BACKEND, "--threads", str(a.threads),
                    "--voice-ref", ref, "--reference-text", rtext or "",
                    "--text", text, "--seed", str(s), "--out", out,
-                   "--request-option", "max_tokens=%d" % mtok(len(text.split()))]
+                   "--request-option", "max_tokens=%d" % (
+                       a.mtok_fixed if a.mtok_fixed > 0
+                       else mtok(len(text.split())) + a.mtok_bonus)]
+            if a.speaking_rate > 0:
+                cmd += ["--speaking-rate", "%.3f" % a.speaking_rate]
+            if a.target_dur > 0:
+                cmd += ["--target-duration-seconds", "%.3f" % a.target_dur]
             # mem_saver 是本机 8G 显存的将就手段；云上 16G/32G 关掉更快（_paths 控制）
             cmd += P.mem_saver_args() + ["--metrics"]
             try:

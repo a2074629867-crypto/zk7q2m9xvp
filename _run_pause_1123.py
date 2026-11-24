@@ -19,10 +19,22 @@ import os
 import sys
 
 BASE = r'G:/_setup'
-IN = os.path.join(BASE, '_regen_1123')
-OUT = os.path.join(BASE, '_regen_1123_paused')
 
-ids = json.load(open(os.path.join(BASE, '_narr_ids716.json'), encoding='utf-8'))
+def _arg(name, default):
+    if name in sys.argv:
+        k = sys.argv.index(name)
+        v = sys.argv[k + 1]
+        del sys.argv[k:k + 2]
+        return v
+    return default
+
+IN = _arg('--in', os.path.join(BASE, '_regen_1123'))
+OUT = _arg('--out', os.path.join(BASE, '_regen_1123_paused'))
+REPORT = _arg('--report', os.path.join(BASE, '_pause_regen1123_report.json'))
+
+_IDF = '_narr_ids726.json' if os.path.exists(os.path.join(BASE, '_narr_ids726.json')) \
+       else '_narr_ids716.json'
+ids = json.load(open(os.path.join(BASE, _IDF), encoding='utf-8'))
 ids = [str(i) for i in dict.fromkeys(ids)]
 if '--only' in sys.argv:
     # ★ 显式 --only 时不再与 716 集求交：历史缺口那 10 句（带内嵌引号）本来就不在 716 里，
@@ -41,7 +53,7 @@ sys.argv = [
     '--who', 'narrator',
     '--bed-self',
     '--only', ','.join(ids),
-    '--report', os.path.join(BASE, '_pause_regen1123_report.json'),
+    '--report', REPORT,
 ]
 
 src = open(os.path.join(BASE, 'mt_final_pause.py'), encoding='utf-8').read()

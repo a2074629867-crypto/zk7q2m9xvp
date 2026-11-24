@@ -18,10 +18,15 @@
 import argparse
 import json
 import os
+import sys
 from collections import Counter
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import numpy as np
 import soundfile as sf
+
+import _speedlib  # 句中语速量具（唯一口径），见其 docstring
 
 FL = 0.02
 LVL_TARGET = -24.0      # dBFS
@@ -131,12 +136,21 @@ def main():
         tail = float(dur - (cc[-1] + 2) * FL) if len(cc) else dur
         # 有声时长（去掉内部静音）
         voiced_dur = float(len(snd) * FL)
-        wpm = (r.get("words", 0) / voiced_dur * 60.0) if voiced_dur > 0.2 else None
+        # ★ 2026-11-24 改口径：语速 = 词数 ÷ **句内发声时长**（剔除逗号/句号的大间隔）。
+        #   旧口径有两种错法：页面用「总时长」（把停顿算进分母，同一条换个停顿就换一个 wpm）；
+        #   这里用「−45dBFS 以上的帧数」（软辅音被切掉，偏高）。统一到 _speedlib：
+        #   以「≥0.15s 的低能量段」为停顿，其余都算发声。
+        _d, _sp, _g, _mg, _ld, _tl = _speedlib.speech_time(y, sr)
+        wpm_in = (r.get("words", 0) / _sp * 60.0) if _sp > 0.15 else None
+        wpm_old = (r.get("words", 0) / voiced_dur * 60.0) if voiced_dur > 0.2 else None
         rows.append(dict(id=r["id"], words=r.get("words", 0), dur=round(dur, 2),
                          peak=round(peak, 4), lvl=None if lv is None else round(lv, 1),
                          lead=round(lead, 2), tail=round(tail, 2),
                          voiced=round(voiced_dur, 2),
-                         wpm=None if wpm is None else round(wpm, 1)))
+                         speech=round(_sp, 2), pause=round(_g, 2),
+                         pause_max=round(_mg, 2),
+                         wpm=None if wpm_in is None else round(wpm_in, 1),
+                         wpm_old=None if wpm_old is None else round(wpm_old, 1)))
 
     lv = np.array([r["lvl"] for r in rows if r["lvl"] is not None])
     med = float(np.median(lv)) if len(lv) else LVL_TARGET
@@ -179,7 +193,10 @@ def main():
     rc = Counter(wd.split()[0] for r in rows for wd in r["why"])
     print("  原因:", dict(rc.most_common(10)))
     wp = [r["wpm"] for r in rows if r["wpm"]]
-    print("  语速 p10=%.0f p50=%.0f p90=%.0f wpm" % tuple(np.percentile(wp, [10, 50, 90])))
+    wq = [r["wpm_old"] for r in rows if r.get("wpm_old")]
+    print("  句中语速 p10=%.0f p50=%.0f p90=%.0f wpm" % tuple(np.percentile(wp, [10, 50, 90])))
+    if wq:
+        print("  （旧口径−45dB帧数 p50=%.0f；页面曾用总时长，更低）" % np.percentile(wq, 50))
     print("  尾部衰减 p10=%.2fs  p50=%.2fs" % tuple(np.percentile([r["tail"] for r in rows], [10, 50])))
     # ★ 需求 2 的第二半句：「条间跨度 ≤1dB」。这是**批级**判据，逐条判不了。
     ok_span = span <= SPAN_TOL

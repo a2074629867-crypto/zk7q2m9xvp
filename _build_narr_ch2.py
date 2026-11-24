@@ -22,6 +22,10 @@ import numpy as np
 import soundfile as sf
 
 ROOT = "G:/_setup"
+sys_path = ROOT
+if sys_path not in __import__("sys").path:
+    __import__("sys").path.insert(0, sys_path)
+import _speedlib  # 句中语速（唯一口径）
 A_NEW = "_audio_ch123/out_paused_narr"   # 三档停顿（候选）
 A_OLD = "_audio_ch123/out"               # 已验收基线
 PLAN = "_narr_plan_for_pause.jsonl"
@@ -201,10 +205,16 @@ def main():
 
         d0 = (takes.get("new") or takes.get("old") or {}).get("dur")
         nw = r.get("words") or len(text.split())
+        # ★ 2026-11-24 改口径：wpm = 词数 ÷ **句内发声时长**（不含逗号/句号的大间隔）。
+        #   旧写法 nw/d0 把停顿算进分母 ⇒ 同一条音频换个停顿就换一个 wpm，
+        #   既不是「说得快」也不是「停顿多」，两个变量混在一起没法判断。
+        _src = (takes.get("new") or takes.get("old") or {}).get("src")
+        _wpm = _speedlib.wpm_in(os.path.join(ROOT, _src), nw) if _src else None
         out_rows.append({
             "id": i, "para": r.get("para"), "part": r.get("part"),
             "text": text, "html": body, "words": nw,
-            "wpm": int(round(nw / d0 * 60)) if d0 else None,
+            "wpm": int(round(_wpm)) if _wpm else None,
+            "wpm_total": int(round(nw / d0 * 60)) if d0 else None,
             "stress": has_st, "slow": slow, "rate": rv,
             "pauses": len(marks), "takes": takes,
         })
@@ -421,7 +431,7 @@ function render(){
         <span class="rkd">${r.takes.rework.dur.toFixed(2)}s · 5s 单句参考 · 本轮新 take（未回填）</span>
       </div>`:''}
       <div class="meta">
-        <span><b>${fmt(r.wpm)}</b> wpm</span>
+        <span title="句中语速：词数 ÷ 句内发声时长，不含逗号句号的大间隔"><b>${fmt(r.wpm)}</b> wpm<small style="color:var(--tx3)"> 句中</small></span>
         <span><b>${fmt(r.words)}</b> 词</span>
         ${t&&t.ng!==null&&t.ng!==undefined?`<span>静音 <b>${t.ng}</b> 处 · 中位 <b>${fmt(t.gmed)}</b>s</span>`:''}
         <span style="color:var(--tx3)">${src==='new'?'三档停顿版':'验收版'}</span>
@@ -556,7 +566,8 @@ window.addEventListener('resize', ()=>{ render(); });
 renderStats(); render();
 $('#foot').innerHTML = '音源：<b>三档停顿版</b> <span class="mono">'+DATA.srcNew+'</span>（716/716 注入完成，物理闸同数 PASS 712）　·　<b>验收版</b> <span class="mono">'+DATA.srcOld+'</span>（PASS 712 基线）。两版同句 AB 可直接切换对比。'
   + (DATA.stat.rework? '<br><b style="color:var(--ok)">返工版</b> <span class="mono">'+DATA.srcRework+'</span>：' + DATA.stat.rework + ' 句换成 2026-11-21 00:4x 按 5s 单句参考重生成的 take（已按 cov / 像喊 / 缺词 筛过种子）。<b>尚未回填</b>到上面的音源目录，听感点头后再回填。' : '')
-  + '<br><b>红字重音与 0.84× 慢读只存在于标注层，尚未进入音频</b>：词级 rate 标签 11-21 实测无效'
+  + '<br><b>语速已按真人母带校准</b>：每句 tempo 逐句压缩到 175 wpm（真人 p50），0.84 慢读档落在 147 wpm；'
+  + '红字重音仍只存在于标注层（词级 rate 标签 11-21 实测无效，改走换 seed 择优）'
   + '（factor 0.70 与 1.40 输出时长完全相同，被点名的词一次都没被拉长），详见 DECISIONS.md 2026-11-21 那条。'
   + '听感与标注不一致是预期内的，不是漏做。';
 </script></body></html>

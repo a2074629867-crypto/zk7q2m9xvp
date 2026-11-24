@@ -41,9 +41,29 @@ BASE = os.path.join(ROOT, "_align_baseline.json")
 
 sys.path.insert(0, ROOT)
 from _stress_adv import is_adv, clean, nsyl  # noqa: E402
+import ch123_rebuild as _RB              # noqa: E402
 
 _BL = json.load(io.open(BASE, encoding="utf-8"))
 A, B, SD = _BL["A"], _BL["B"], _BL["SD"]
+
+# 整句拖长不算重音（STRESS_PLAYBOOK §8.4 FULL_GAIN_MAX 的本意）。
+# 实测：换 seed 后句子变长的，增量里 76%~81% 是**多插的静音**，不是词被读重。
+# ⇒ 静音增长超过这个秒数就判「拖慢冒充重音」，不采纳。
+SIL_GROWTH_MAX = 0.50
+
+
+def _dur_sil(path):
+    """返回 (总时长, 内部静音合计)。split_at_silence 与 trim 用的是同一把尺子。"""
+    try:
+        import soundfile as sf
+        y, sr = sf.read(path, dtype="float32")
+        if y.ndim > 1:
+            y = y.mean(1)
+        segs = _RB.split_at_silence(y, sr, min_gap=0.10)
+        sil = sum(max(0.0, segs[i + 1][0] - segs[i][1]) for i in range(len(segs) - 1))
+        return len(y) / float(sr), sil
+    except Exception:  # noqa: BLE001
+        return None, None
 
 
 def run(cmd, timeout=3600, quiet=False):
@@ -97,17 +117,31 @@ def stage_plan(after, limit):
 
 
 # ------------------------------------------------------------ rel_z 计算
-def word_zs(rec):
+def word_zs(rec, wav=None, voiced=True):
+    """词级 rel_z。voiced=True 时逐词剪掉首尾静音（ASR span 含停顿，见 _speedlib.word_durs）。"""
+    import _speedlib as _SL
+    import soundfile as _sf
+    durs = None
+    if voiced and wav:
+        try:
+            _y, _sr = _sf.read(wav, dtype="float32")
+            if _y.ndim > 1:
+                _y = _y.mean(1)
+            _durs = _SL.word_durs(_y, _sr, rec.get("words") or [])
+            it = iter(_durs)
+            durs = [next(it) for _ in (rec.get("words") or [])]
+        except Exception:  # noqa: BLE001
+            durs = None
     ws = []
-    for w in rec.get("words") or []:
+    for i, w in enumerate(rec.get("words") or []):
         d = clean(w["w"])
         if not d:
             continue
         ns = nsyl(w["w"])
         if ns <= 0:
             continue
-        dur = max(1e-3, float(w["end"]) - float(w["start"]))
-        ws.append(dict(w=d, ns=ns, dur=dur, sps=dur / ns))
+        dur = (durs[i] if durs else max(1e-3, float(w["end"]) - float(w["start"])))
+        ws.append(dict(w=d, ns=ns, dur=max(1e-3, dur), sps=max(1e-3, dur) / ns))
     if len(ws) < 3:
         return ws
     med = st.median([x["sps"] for x in ws])
@@ -126,7 +160,7 @@ def z_of(ws, word, occ=0):
 
 
 # ------------------------------------------------------------- stage repick
-def stage_repick(targets, seeds, limit):
+def stage_repick(targets, seeds, limit, pickonly=False):
     if not targets:
         p = os.path.join(ROOT, "_loop_targets.json")
         targets = json.load(io.open(p, encoding="utf-8")) if os.path.exists(p) else []
@@ -153,6 +187,8 @@ def stage_repick(targets, seeds, limit):
     made = []
     for sid in sorted(by_sid):
         for sd in seeds:
+            if pickonly:
+                continue
             # ★ 必须绝对路径：regen_narr 调 audiocpp 时 cwd 是 acpp 目录，
             #   相对 --out 会被写到 acpp 目录下（2026-11-23 踩过一次，5 个 take 全丢）。
             out = os.path.join(ROOT, "_loop_takes", "s%d" % sd)
@@ -168,29 +204,45 @@ def stage_repick(targets, seeds, limit):
             if ok:
                 made.append(os.path.join(out, sid + ".wav").replace("\\", "/"))
 
-    if not made:
+    if not made and not pickonly:
         print("没有新 take"); return []
 
+    # ★ 2026-11-24 修：take 文件名在三个 seed 目录里完全相同（c1_0011.wav），
+    #   原先按 basename 压键会把 seed 丢掉 ⇒ 后面用 "sid_s43" 查永远查不到，
+    #   表现为「最好 无 / 采纳 0」。键必须带目录名：s43/c1_0011。
     wl = os.path.join(ROOT, "_loop_takes_wl.json")
     lp = os.path.join(ROOT, "_loop_takes_list.txt")
-    io.open(lp, "w", encoding="utf-8").write("\n".join(made))
+    all_takes = []
+    for sd in seeds:
+        d = os.path.join(ROOT, "_loop_takes", "s%d" % sd)
+        if not os.path.isdir(d):
+            continue
+        for f in sorted(os.listdir(d)):
+            if f.endswith(".wav") and not f.startswith("_raw_"):
+                all_takes.append(os.path.join(d, f).replace("\\", "/"))
+    io.open(lp, "w", encoding="utf-8").write("\n".join(all_takes))
+    print("ASR 覆盖 %d 个 take（--append，已有自动跳过）" % len(all_takes), flush=True)
     run([ASR_PY, "_wl_asr.py", "--list", lp, "--out", wl, "--append"], timeout=7200)
-    tw = {os.path.basename(k).rsplit(".", 1)[0]: v
-          for k, v in json.load(io.open(wl, encoding="utf-8")).items()}
+    tw = {}
+    for k, v in json.load(io.open(wl, encoding="utf-8")).items():
+        kk = k.replace("\\", "/")
+        tw["%s/%s" % (os.path.basename(os.path.dirname(kk)),
+                      os.path.basename(kk).rsplit(".", 1)[0])] = v
 
     rows = []
     for sid, tg in sorted(by_sid.items()):
         cur = orig_wl.get(sid)
         cur_n = len([w for w in (cur or {}).get("words", []) if clean(w["w"])])
+        cur_ws = word_zs(cur, os.path.join(ROOT, "_regen_1123", sid + ".wav")) if cur else []
         best = None
         detail = []
         for sd in seeds:
-            key = "%s_s%d" % (sid, sd)
+            key = "s%d/%s" % (sd, sid)
             rec = tw.get(key)
             if not rec:
                 detail.append({"seed": sd, "z": None})
                 continue
-            ws = word_zs(rec)
+            ws = word_zs(rec, os.path.join(ROOT, "_loop_takes", "s%d" % sd, sid + ".wav"))
             n_take = len([w for w in rec.get("words", []) if clean(w["w"])])
             zs = [z_of(ws, t["w"], t.get("occ", 0)) for t in tg]
             zs = [z for z in zs if z is not None]
@@ -204,9 +256,24 @@ def stage_repick(targets, seeds, limit):
                 continue
             if best is None or zv > best["z"]:
                 best = {"z": zv, "seed": sd, "drop": drop}
-        curz = max((t["z"] for t in tg), default=None)
+        # 现状的 z 也用同一把尺子（逐词剪静音），否则新旧不同口径
+        _cz = [z_of(cur_ws, t["w"], t.get("occ", 0)) for t in tg]
+        _cz = [z for z in _cz if z is not None]
+        curz = round(max(_cz), 2) if _cz else max((t["z"] for t in tg), default=None)
         adopt = bool(best and curz is not None and best["z"] > curz + 0.30
                      and best["z"] >= 0.60)
+        # ★ 静音闸：换 seed 变长、且多出来的部分主要是静音 ⇒ 是拖慢，不是重音
+        sil_note = ""
+        if adopt:
+            src = os.path.join(ROOT, "_loop_takes", "s%d" % best["seed"], sid + ".wav")
+            c_dur, c_sil = _dur_sil(os.path.join(ROOT, "_regen_1123", sid + ".wav"))
+            n_dur, n_sil = _dur_sil(src)
+            if None not in (c_sil, n_sil):
+                grow = n_sil - c_sil
+                if grow > SIL_GROWTH_MAX:
+                    adopt = False
+                    sil_note = "  静音 +%.2fs(占时长增量 %.0f%%) ⇒ 拖慢不算重音" % (
+                        grow, 100 * grow / max(1e-6, (n_dur - c_dur)))
         if adopt:
             src = os.path.join(ROOT, "_loop_takes", "s%d" % best["seed"], sid + ".wav")
             dst = os.path.join(ROOT, "_loop_pick", sid + ".wav")
@@ -214,11 +281,11 @@ def stage_repick(targets, seeds, limit):
             shutil.copy2(src, dst)
         rows.append({"sid": sid, "words": [t["w"] for t in tg], "cur_z": curz,
                      "best_z": best and best["z"], "best_seed": best and best["seed"],
-                     "adopt": adopt, "detail": detail})
-        print("   %-9s 现 %+.2f → 最好 %s  %s"
+                     "adopt": adopt, "sil_note": sil_note, "detail": detail})
+        print("   %-9s 现 %+.2f → 最好 %s  %s%s"
               % (sid, curz if curz is not None else 0,
                  ("%+.2f(s%d)" % (best["z"], best["seed"])) if best else "无",
-                 "采纳" if adopt else "保留"), flush=True)
+                 "采纳" if adopt else "保留", sil_note), flush=True)
 
     rep = os.path.join(ROOT, "_loop_pick_report.json")
     json.dump(rows, io.open(rep, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
@@ -236,6 +303,8 @@ def main():
     ap.add_argument("--tag", default="after")
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--seeds", default="43,44,45")
+    ap.add_argument("--pick-only", action="store_true",
+                    help="跳过生成，只对磁盘上已有的 take 做 ASR + 择优（修键后重评用）")
     a = ap.parse_args()
     seeds = [int(x) for x in a.seeds.split(",") if x.strip()]
 
@@ -251,7 +320,7 @@ def main():
         after = json.load(io.open(p, encoding="utf-8"))
         stage_plan(after, a.limit)
     if a.stage in ("repick", "all"):
-        stage_repick(None, seeds, a.limit)
+        stage_repick(None, seeds, a.limit, pickonly=a.pick_only)
 
 
 if __name__ == "__main__":

@@ -28,9 +28,26 @@ import math
 import os
 import re
 import statistics as st
+import sys
 
 import numpy as np
 import soundfile as sf
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _speedlib  # noqa: E402  逐词剪静音用
+
+
+def _voiced_span(y, sr, t0, t1, thr):
+    """词 span 内「首尾都过阈值」的时长：把词尾吞进去的停顿剪掉。"""
+    i0 = max(0, int(t0 * sr))
+    i1 = min(len(y), int(t1 * sr))
+    if i1 - i0 < int(0.04 * sr):
+        return max(1e-3, t1 - t0)
+    db, h = _speedlib._frames_db(y[i0:i1], sr)
+    on = np.flatnonzero(db > thr)
+    if len(on) == 0:
+        return max(1e-3, 0.04)
+    return max(1e-3, float(on[-1] - on[0] + 1) * (h / float(sr)))
 
 ROOT = r"G:/_setup"
 BASE = os.path.join(ROOT, "_align_baseline.json")
@@ -130,11 +147,16 @@ def auc(pos, neg):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dir", default="_audio_ch123/out_bak_prepause")
+    ap.add_argument("--voiced", action="store_true",
+                    help="逐词剪掉首尾静音再算时长（ASR 词时长含停顿，见文件头注释）")
     ap.add_argument("--wl", default="_wl_words.json")
     ap.add_argument("--tag", default="before")
     ap.add_argument("--only", default="",
                     help="只测这批 sid（逗号分隔或文件，每行一个）。用于新旧同口径对比")
     a = ap.parse_args()
+    voiced = bool(a.voiced)
+    if voiced:
+        print("口径：逐词剪掉首尾静音（--voiced）", flush=True)
 
     bl = json.load(io.open(BASE, encoding="utf-8"))
     A, B, SD = bl["A"], bl["B"], bl["SD"]
@@ -180,6 +202,14 @@ def main():
             continue
 
         ws = []
+        # ★ 2026-11-24：ASR 的词时间戳首尾相接（`_asr_lib._to_words` 里 end = 下一词 start，
+        #   末词 end = 文件尾），停顿会被吞进前一个词的时长。实测同一条 c1_0018：
+        #   干声版 `jaw` 1.04s，插停顿版 2.16s —— 差的全是停顿。
+        #   `--voiced` 用波形把每词的首尾低能量段剪掉，只留真正发声的时长。
+        _thr = None
+        if voiced:
+            _db, _h = _speedlib._frames_db(y, sr)
+            _thr = max(-60.0, float(np.percentile(_db, 90)) - 20.0)
         for w in rec["words"]:
             d = clean(w["w"])
             if not d:
@@ -187,7 +217,11 @@ def main():
             ns = nsyl(w["w"])
             if ns <= 0:
                 continue
-            dur = max(1e-3, float(w["end"]) - float(w["start"]))
+            t0, t1 = float(w["start"]), float(w["end"])
+            if voiced:
+                dur = _voiced_span(y, sr, t0, t1, _thr)
+            else:
+                dur = max(1e-3, t1 - t0)
             ws.append(dict(w=d, raw=w["w"], ns=ns, dur=dur, sps=dur / ns))
         if len(ws) < 3:
             continue

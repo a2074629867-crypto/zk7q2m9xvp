@@ -9,10 +9,13 @@ import glob
 import io
 import json
 import os
+import sys
 import wave
 
 ROOT = r"G:/_setup"
-NEW = os.path.join(ROOT, "_regen_1123")
+sys.path.insert(0, ROOT)
+import _speedlib  # 句中语速（唯一口径）
+NEW = os.path.join(ROOT, "_regen_final")
 OLD = os.path.join(ROOT, "_audio_ch123", "out")
 PLAN2 = os.path.join(ROOT, "_castle_en_ch123_plan_v2.jsonl")
 PLAN1 = os.path.join(ROOT, "_castle_en_ch123_plan.jsonl")
@@ -53,8 +56,12 @@ def main():
         r1 = float((p1.get(sid) or {}).get("rate") or 0.8)
         txt = (p2.get(sid) or {}).get("text") or ""
         nw = len(txt.split())
+        # ★ 2026-11-24：语速一律用「句中语速」（词数 ÷ 句内发声时长）。
+        #   旧写法 60*nw/dur 把停顿算进分母，A/B 两列的差值里混着停顿差异。
+        wo = _speedlib.wpm_in(po, nw) or (60 * nw / do)
+        wn = _speedlib.wpm_in(pn, nw) or (60 * nw / dn)
         rows.append(dict(id=sid, txt=txt, do=do, dn=dn, r1=r1, r2=r2,
-                         wo=60 * nw / do, wn=60 * nw / dn, nw=nw))
+                         wo=wo, wn=wn, nw=nw))
 
     tr = "".join(
         """<tr>
@@ -64,7 +71,7 @@ def main():
   <td class="num">新 {dn:.2f}s<br><b>{wn:.0f} wpm</b></td>
   <td class="num">{ratio:+.0%}</td>
   <td class="au"><div class="lab">A 旧</div><audio controls preload="none" src="_audio_ch123/out/{id}.wav"></audio>
-      <div class="lab">B 新</div><audio controls preload="none" src="_regen_1123/{id}.wav"></audio></td>
+      <div class="lab">B 新</div><audio controls preload="none" src="_regen_final/{id}.wav"></audio></td>
 </tr>""".format(ratio=(dn / do - 1), **r) for r in rows)
 
     n = len(rows)
