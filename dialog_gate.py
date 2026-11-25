@@ -164,6 +164,49 @@ def audio_stats(path):
         tail_ratio = float(np.sqrt((_seg ** 2).mean()) + 1e-9) / body_rms
     else:
         tail_gap, tail_ratio = 0.0, 0.0
+
+    # ★ 2026-11-24 新增：噪声类指标。此前 G1 只测削波/静音占比/硬切/RMS，
+    #   完全没有「底噪」与「段间底噪一致性」，所以 190 条底噪 > −60 dBFS 的成品
+    #   一路被judged A 档送到用户耳朵里（用户原话：「这么明显的错误都没排除掉」）。
+    #   帧能量用整段 10ms 帧（不是 silent 那种 10ms 窗口），口径与 _noise_stats.py 一致。
+    fr_all = fr
+    fr_db = 20 * np.log10(np.maximum(fr_all, 1e-12))
+    floor_db = float(np.percentile(fr_db, 10))
+    snr_db = float(np.percentile(fr_db, 95) - floor_db)
+
+    # 数字零：abs(x)==0 是 PCM 的绝对静音，人声不可能出现；插停顿灌零 / 裁尾都会留下
+    z = np.flatnonzero(x == 0.0)
+    zero_ms = 0.0
+    if len(z):
+        _runs = np.split(z, np.flatnonzero(np.diff(z) != 1) + 1)
+        zero_ms = float(sum(len(r) / sr * 1000 for r in _runs if len(r) / sr >= 0.010))
+
+    # 段间底噪跨度：200ms 块各自的 p10，取 max−min。听感「忽有忽无」就是这个数大
+    # 段间底噪跨度：只比「真静音块」之间的底噪。
+    # ★ 2026-11-24 改：原来取所有 200ms 块 p10 的 max−min，正常条也报 38~55 dB
+    #   （含语音的块 p10 天然高），等于 100% 误报。改成先筛 p10 < p97−30dB 的静音块，
+    #   再比这些块之间的跨度 —— c2_0291 是 −240 与 −70 混着，才会露出来。
+    _blk = int(0.2 * sr)
+    _jumps = []
+    if _blk > 0 and len(x) >= 3 * _blk:
+        for i in range(len(x) // _blk):
+            seg = x[i * _blk:(i + 1) * _blk]
+            m = len(seg) // w
+            if m < 5:
+                continue
+            f2 = np.sqrt((seg[:m * w].reshape(m, w) ** 2).mean(1)) + 1e-12
+            _jumps.append(float(np.percentile(20 * np.log10(f2), 10)))
+    _p97all = float(np.percentile(fr_db, 97))
+    _quiet = [v for v in _jumps if v < _p97all - 30.0]
+    floor_jump = float(max(_quiet) - min(_quiet)) if len(_quiet) >= 2 else 0.0
+
+    # 硬切：看最后 2ms 的 RMS 占峰值的比例。
+    # ★ 旧判据（tail_gap<0.04 且 tail_ratio>=0.7）误报率极高：c1_0034/c2_0306 这类
+    #   收在元音上的正常句，尾部本来就满幅、也没有静音，一律被判「真硬切」。
+    #   实测正常条 last2ms ≤1.2%pk，而人为砍尾的样本是 2.6%～3.4% ⇒ 卡 2%。
+    _t2 = x[-max(1, int(0.002 * sr)):]
+    tail_last_ratio = float(np.sqrt((_t2 ** 2).mean())) / max(peak, 1e-9)
+
     return {
         "dur": round(len(x) / sr, 2),
         "rms_db": round(20 * np.log10(rms), 1),
@@ -172,11 +215,26 @@ def audio_stats(path):
         "tail_db": round(20 * np.log10(tail_rms / body_rms), 1),
         "tail_gap": round(tail_gap, 3),
         "tail_ratio": round(tail_ratio, 2),
+        "floor_db": round(floor_db, 1),
+        "snr_db": round(snr_db, 1),
+        "zero_ms": round(zero_ms, 1),
+        "floor_jump": round(floor_jump, 1),
+        "tail_last_ratio": round(tail_last_ratio, 4),
     }
 
 
-def gate_tech(s):
-    """G1 技术闸门：只看信号，不看语义。硬缺陷 → REGEN；可修项 → 只记提示。"""
+def gate_tech(s, strict_floor=False):
+    """G1 技术闸门：只看信号，不看语义。硬缺陷 → REGEN；可修项 → 只记提示。
+
+    ★ 2026-11-24：补噪声类判据（底噪 / SNR / 数字零 / 段间底噪跨度 / 硬切升 REGEN）。
+    此前这一闸完全没有噪声项，导致「底噪 −33 dBFS、SNR 10.8 dB」的条也能过七闸进 A 档。
+    阈值标定见 _noise_stats.json（239 条实测），不是拍数字：
+      底噪 p50 −53.8 / p90 −44.0  ⇒ 统一目标 −72，闸卡 −60（留 12 dB 余量）
+      SNR   p10  25.7 / p50 34.7  ⇒ 闸卡 25（只拦真正的糊条，8%）
+      数字零 40% 的条带，c2_0291 高达 1282 ms ⇒ 闸卡 20 ms
+      段间跨度 95% >6 dB ⇒ 默认只记 note（全库未统一前开硬闸会把 95% 判死），
+                          --strict-floor 时才判 REGEN
+    """
     notes = []
     verdict = "PASS"
     # ★ 2026-11-11 修：短句判 MANUAL，不判 REGEN。
@@ -196,17 +254,37 @@ def gate_tech(s):
     # ★ 2026-11-11 修：旧判据 `tail_db < -35` 在 45 条候选上触发 38 条（84%），
     #   因为它是绝对能量，正常收尾的静音也照触发；实测无一条真截断。
     #   改成看「语音结束后还有没有静音」+「收尾那一帧是否还是满幅」。
-    gap = s.get("tail_gap")
-    ratio = s.get("tail_ratio")
-    if s["dur"] >= 0.9 and gap is not None and ratio is not None and gap < 0.04:
-        if ratio >= 0.7:
-            notes.append(("hard_cut", "语音在满幅处被掐断（尾静音 %.0fms，收尾音量 %.0f%%），真硬切" % (
-                gap * 1000, ratio * 100)))
-        elif ratio >= 0.4:
-            notes.append(("tail_abrupt", "收尾未完全衰减（尾静音 %.0fms，收尾音量 %.0f%%），可听确认" % (
-                gap * 1000, ratio * 100)))
+    # ★ 2026-11-24 改：硬切判据换成「最后 2ms RMS / 峰值」。
+    #   旧判据（tail_gap<0.04 且 tail_ratio>=0.7）在阴性对照上误报 2/5 ——
+    #   c1_0034（ratio 1.08）和 c2_0306（0.71）都是收在元音上的正常句。
+    #   实测正常条 last2ms ≤1.2%pk，人为砍尾 2.6~3.4% ⇒ 卡 2%。
+    tlr = s.get("tail_last_ratio")
+    if s["dur"] >= 0.9 and tlr is not None and tlr > 0.02:
+        verdict = "REGEN"
+        notes.append(("hard_cut", "尾部 2ms 仍为 %.1f%% 峰值，波形被直接掐断" % (tlr * 100)))
     if abs(s["rms_db"] + 24) > 8:
         notes.append(("level_off", "RMS %.1f dBFS，偏离全库 −24 有 %.0f dB" % (s["rms_db"], abs(s["rms_db"] + 24))))
+
+    # ★ 2026-11-24 新增噪声判据
+    fd = s.get("floor_db")
+    if fd is not None and fd > -60.0:
+        verdict = "REGEN"
+        notes.append(("noise_floor", "底噪 %.1f dBFS（统一目标 −72，闸 −60）" % fd))
+    sd = s.get("snr_db")
+    if sd is not None and sd < 25.0:
+        verdict = "REGEN"
+        notes.append(("snr_low", "SNR %.1f dB（<25，人声与底噪分不开）" % sd))
+    zm = s.get("zero_ms")
+    if zm is not None and zm > 20.0:
+        verdict = "REGEN"
+        notes.append(("digital_zero", "数字零累计 %.0f ms（人声不可能出现；插停顿灌零/裁尾留下）" % zm))
+    fj = s.get("floor_jump")
+    if fj is not None and fj > 10.0:
+        if strict_floor:
+            verdict = "REGEN"
+            notes.append(("floor_jump", "段间底噪跨度 %.0f dB（>10，听感忽有忽无）" % fj))
+        else:
+            notes.append(("floor_jump", "段间底噪跨度 %.0f dB（>10，全库统一后才严判）" % fj))
     return verdict, notes
 
 
@@ -264,7 +342,11 @@ MIN_SPK_DUR = 1.0
 EMO2EN = {
     "激动反抗": {"loud", "defiant", "angry", "scold"},
     "平静": {"calm", "neutral", "normal"},
-    "紧张": {"nervous", "panic"},
+    "紧张": {"nervous", "panic",
+             # ★ 2026-11-24 用户定调：紧张档取消，全部走平静。
+             #   生成用 calm/neutral/normal/wary 都是**刻意**的，不是缺档替代。
+             #   加上这些键，fallback 才会算 False，台账不会把它记成「缺档」。
+             "calm", "neutral", "normal", "wary"},
     "警惕": {"wary"},
     "委屈": {"soft", "wronged", "begging"},
     "兴奋": {"excited"},
@@ -559,9 +641,9 @@ def _voice_emo(voice):
 def one(ev, wav, who=None, emo=None, stats=None, vox=None, e2v=None,
         identify=False, role_blind=(), weak_guard=True, no_conflict=False,
         spk_mode="centroid", voice=None, intra=True, scs=True, nat=True,
-        seq=True):
+        seq=True, strict_floor=False):
     tech = audio_stats(wav)
-    t_v, t_notes = gate_tech(tech)
+    t_v, t_notes = gate_tech(tech, strict_floor=strict_floor)
     spk, s_v, s_notes = gate_speaker(ev, wav, who, identify=identify,
                                      role_blind=role_blind, weak_guard=weak_guard,
                                      no_conflict=no_conflict, mode=spk_mode,

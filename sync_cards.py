@@ -128,7 +128,8 @@ def build_state_card(state_text):
     L = ['<!-- AUTO:STATE 由 sync_cards.py 从 G:/_setup/STATE.md 生成，勿手改 -->',
          '# STATE 摘要（正文 %d 行：`G:/_setup/STATE.md`）' % len(state_text.splitlines()),
          '',
-         '> 源更新时间：**%s**' % upd,
+         '> ⚠ **本卡可能滞后：现状以 `F:/Charles/HANDOFF.md` 为准。**',
+        '> 源更新时间：**%s**' % upd,
          '> 卡片生成：%s ｜ 这份只放「现在在哪」，细节一律 Read 正文，别在卡片上推演。' %
          datetime.datetime.now().strftime('%Y-%m-%d %H:%M'),
          '',

@@ -61,6 +61,14 @@ GAP_MIN = 0.30          # 与 stim_tier 的档间最小极差一致
 
 # (角色, 中文情绪) -> 英文格。与 rebuild_plan_v2.py 的 V 表一致，
 # 但拆成「主格 / 退路格」两层，退路格要标出来（库缺档，不是我们选错）。
+# ★ 2026-11-24 用户定调：**「紧张」这一档取消，全部走平静**。
+#   理由（用户原话）：「紧张不是那种小声说话，然后停顿比较多的吗？如果说作者没有
+#   写到这种比较多停顿的话，就不用啊，那就平常说话就行了。」
+#   实测支撑：39 条紧张里只有 8 条带省略号，且 25 条 Charles 紧张中 9 条是 1 词短句
+#   （No./Yes./Moths.）；F0 中位 256 vs 平静 246，两者在物理上是同一档。
+#   而旧映射把紧张指到 Charles_nervous（素材 F0 335 = 喊）→ 生成出「喊着说话」。
+#   停顿信息本来就在文本里（省略号/破折号），不需要靠参考档表达。
+#   True = 「退路格」，但这里不是库缺档，是**刻意走平静**（见 emo_note）。
 CELL = {
     "Charles": {"平静": ("neutral", False), "兴奋": ("excited", False),
                 "激动反抗": ("angry", False), "委屈": ("soft", False),
@@ -70,10 +78,10 @@ CELL = {
                "紧张": ("calm", True), "警惕": ("scold", False)},
     "Joseph": {"平静": ("normal", False), "兴奋": ("excited", False),
                "激动反抗": ("defiant", False), "委屈": ("wronged", False),
-               "紧张": ("nervous", False), "警惕": ("wary", False)},
+               "紧张": ("normal", True), "警惕": ("wary", False)},
     "Helena": {"平静": ("wary", True), "兴奋": ("excited", False),
                "激动反抗": ("defiant", False), "委屈": ("wronged", False),
-               "紧张": ("nervous", False), "警惕": ("wary", False)},
+               "紧张": ("wary", True), "警惕": ("wary", False)},
 }
 
 

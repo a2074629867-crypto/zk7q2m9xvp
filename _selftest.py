@@ -289,9 +289,19 @@ def t5():
         prev = hm[rid]["verdict"]
         now = row["verdict"]
         s = row.get("spk") or {}
-        same = (prev == now)
+        # ★ 2026-11-24 改：只比 **G3 情绪闸**。
+        #   原来比总 verdict，c2_0265 被新加的 G1 噪声闸（noise_floor −50.6）判 REGEN，
+        #   就被记成「情绪闸劣化」—— 张冠李戴。技术闸归 T1/T4 管，这里只管情绪。
+        g_now = (row.get("gates") or {}).get("emotion")
+        g_prev = hm[rid].get("gates", {}).get("emotion") if isinstance(hm[rid], dict) else None
+        if g_now and g_prev:
+            same = (g_prev == g_now)
+            cmp = "emo %s→%s" % (g_prev, g_now)
+        else:
+            same = (prev == now)
+            cmp = "%s→%s" % (prev, now)
         agree += same
-        detail.append("%s %s→%s gap %.3f" % (rid, prev, now,
+        detail.append("%s %s gap %.3f" % (rid, cmp,
                                             s.get("cen_gap") if s.get("cen_gap") is not None else -1))
     n = len([d for d in detail if "跑不动" not in d])
     rec("T5b 情绪闸不劣化", n > 0 and agree == n,

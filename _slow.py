@@ -104,7 +104,7 @@ def main():
         return
 
     plan = {}
-    with open(os.path.join(HERE, "_dlg_plan_v2.jsonl"), encoding="utf-8") as f:
+    with open(os.path.join(HERE, "_dlg_plan_v3.jsonl"), encoding="utf-8") as f:
         for line in f:
             if line.strip():
                 d = json.loads(line)
@@ -121,11 +121,11 @@ def main():
         if y.ndim > 1:
             y = y.mean(1)
         r = R.rate(p, plan[rid]["text"])
-        cur = r["wpm_span"] or r["wpm"]
+        cur = r["wpm"] or r["wpm_span"]   # ★ 2026-11-24：统一用去停顿口径
         rate = max(a.min_rate, min(1.0, a.target_wpm / cur)) if cur else 1.0
         z = wsola(y, sr, rate)
         op = os.path.join(a.out, "%s.wav" % rid)
-        sf.write(op, z, sr, subtype="PCM_16")
+        sf.write(op, z, sr, subtype="PCM_24")
         nr = R.rate(op, plan[rid]["text"])
         print("%-9s %6.0f %6.0f %6.3f %6.0f %.2f→%.2fs" % (
             rid, cur, a.target_wpm, rate, nr["wpm_span"] or 0, len(y) / sr, len(z) / sr))

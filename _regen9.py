@@ -143,6 +143,10 @@ def main():
     else:
         plan = plan[a.offset: a.offset + a.limit] if a.limit else plan[a.offset:]
     seeds = [int(x) for x in a.seeds.split(",") if x.strip()]
+    # ★ 必须转绝对路径：acpp 子进程的 cwd 是 ACPP_DIR（C 盘），
+    #   相对 --out 会把成品写进 C:\...\acpp\ 下，还判成「文件不存在 → FAIL」。
+    #   2026-11-24 踩过：c2_0299 两次跑都成功生成，但都落在 C 盘。
+    a.out = os.path.abspath(a.out)
     os.makedirs(a.out, exist_ok=True)
 
     ok = fail = skip = 0
@@ -163,7 +167,9 @@ def main():
         if a.strip_end_punct:
             text = strip_end_punct(text)
         for s in seeds:
-            tag = a.tag or rid
+            # ★ --tag 只作前缀：多条一起跑时若直接用 tag 命名，所有条会写进同一个
+            #   t__s42.wav 互相覆盖（2026-11-24 踩过，25 条跑完只剩 1 个文件）。
+            tag = ("%s_%s" % (a.tag, rid)) if a.tag else rid
             out = os.path.join(a.out, "%s__s%d.wav" % (tag, s))
             if os.path.exists(out) and os.path.getsize(out) > 50000:
                 skip += 1

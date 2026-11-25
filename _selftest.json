@@ -2,7 +2,7 @@
  {
   "test": "T1 指标基座",
   "ok": true,
-  "detail": "复算一致，最大 Δfloor 0.05 dB"
+  "detail": "复算一致，最大 Δfloor 0.03 dB"
  },
  {
   "test": "T2 吞字环(注入召回)",
@@ -22,12 +22,12 @@
  {
   "test": "T4a 重生成产出有效",
   "ok": true,
-  "detail": "c2_0265__s42.wav 3.68s rms -32.2 peak 0.23 floor -74.4（原 -51.2）复用"
+  "detail": "c2_0265__s42.wav 3.68s rms -32.2 peak 0.23 floor -74.4（原 -45.6）复用"
  },
  {
   "test": "T4b 不回写 out/",
   "ok": true,
-  "detail": "c2_0265 md5 a6220075dc93 dur 1.91 未变"
+  "detail": "c2_0265 md5 dbe216d89ae1 dur 1.83 未变"
  },
  {
   "test": "T4c 回填归一化",
@@ -42,12 +42,12 @@
  {
   "test": "T5b 情绪闸不劣化",
   "ok": true,
-  "detail": "3/3 老 PASS 仍 PASS：c2_0265 PASS→PASS gap 0.334; c3_0623 PASS→PASS gap 0.221; c3_0651 PASS→PASS gap 0.214"
+  "detail": "3/3 老 PASS 仍 PASS：c2_0265 emo PASS→PASS gap 0.333; c3_0623 emo PASS→PASS gap 0.221; c3_0651 emo PASS→PASS gap 0.214"
  },
  {
   "test": "T5c Joseph 角色可测",
   "ok": true,
-  "detail": "c1_0002 Joseph gap 0.594 emo normal(标注平静); c1_0027 Joseph gap 0.625 emo normal(标注平静)"
+  "detail": "c1_0002 Joseph gap 0.594 emo normal(标注平静); c1_0027 Joseph gap 0.807 emo normal(标注平静)"
  },
  {
   "test": "T5d 情绪识别(平静档)",

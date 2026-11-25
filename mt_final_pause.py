@@ -40,7 +40,14 @@ sys.path.insert(0, r'G:/_setup')
 import numpy as np
 import soundfile as sf
 
-from _wtlib import word_times_cached as word_times
+# 2026-11-25：词时间戳从 faster-whisper 换成「字符级强制对齐」（_wtlib2）。
+# whisper 词尾实测 p5 −120ms、|误差| 中位 40ms、24% 的词早于真实词尾 >40ms，
+# 切点落在词尾辅音上就把词劈成两半（c1_0174 himself → "himse … lf"）。
+try:
+    from _wtlib2 import word_times_cached as word_times
+except Exception as _e:                     # 对齐不可用时退回旧路径，并显式告警
+    print('  [warn] _wtlib2 不可用（%s），退回 whisper 词时间' % _e, flush=True)
+    from _wtlib import word_times_cached as word_times
 from insert_pauses import plan_from_proto, tail_punct
 from mt_pause_rules import TIERS_DEFAULT, TIERS_DIALOG, DIALOG_CAP, plan_from_text
 from room_tone import _resample, _rms
@@ -54,6 +61,8 @@ QUIET_BELOW_MED = 25.0     # 比中位低多少 dB 才算安静
 ZERO_DB = -90.0            # 低于此视为数字零
 NOISE_FLOOR_DB = -85.0     # 低于此视为「没有底噪可测」
 MIN_QUIET_FRAMES = 10
+# 2026-11-25：插入切点的落点统计（deep=落在深谷, weak=浅谷, skip=附近没有谷，宁可不插）
+INS_STATS = {'deep': 0, 'weak': 0, 'skip': 0}
 LEVEL_CLAMP_DB = 6.0       # 与基线最大偏差
 # 统一场景底噪：马修真人原声实测 −55.9 dB，留 2 dB 余量，避免比真人录音更响
 SCENE_LEVEL_DB = -58.0
@@ -301,6 +310,57 @@ def safe_del_pos(x, sr, t, amt, ref_db, margin=25.0, search=0.20):
     return (best + nd // 2, best_db) if best_db < ref_db - margin else None
 
 
+def quiet_point(x, sr, t, ref_db, margin=18.0, search=0.18, win=0.020):
+    """在 t±search 内找「能量最低点」作为插入切点。
+
+    为什么必须找（2026-11-25 用户听出 himse/lf）：
+      ins 原来是 `c = int(t*sr)`，t 来自 faster-whisper 的词边界。
+      whisper 的词尾平均早 50~120ms，落在词最后一个辅音上时，插入静音
+      就把这个词劈成两半（c1_0174 的 himself：whisper 说 1.90-2.44，
+      强制对齐实测 /l/ 2.42-2.46、/f/ 2.48-2.52 ⇒ 切在 e 与 lf 之间，
+      听感 = "himse … lf"，贪心解码直接吐出 "HIMSELF OLF"）。
+
+    做法与 safe_del_pos 对称：只认能量，不认时间戳。找不到足够安静的
+    点就返回 None（宁可不插，也不劈词）。
+    """
+    nw = max(2, int(win * sr))
+    lo = max(1, int((t - search) * sr))
+    hi = min(len(x) - nw - 1, int((t + search) * sr))
+    if hi <= lo:
+        return None
+    step = max(1, int(0.005 * sr))
+    dbs, poss = [], []
+    for a in range(lo, hi + 1, step):
+        seg = x[a:a + nw]
+        if len(seg) < nw:
+            break
+        db = 20 * np.log10(np.sqrt((seg.astype(np.float64) ** 2).mean()) + 1e-12)
+        dbs.append(db)
+        poss.append(a + nw // 2)
+    if not dbs:
+        return None
+    dbs = np.array(dbs, dtype=float)
+    poss = np.array(poss, dtype=float)
+    if not np.isfinite(ref_db):
+        return None
+    # 2026-11-25 修 2：原来取「全局最低点」，它会跳到目标间隙之外的另一个更安静的点，
+    # 于是插入的静音和原有静音各自成段 ⇒「洞 + 0.2~0.3s 有声 + 洞」，用户听成「碎」。
+    # 改成：优先取「离词尾最近、且足够安静」的点，插入的静音必然与已有静音连成一段。
+    # 同时不允许早于词尾 20ms（否则又切进词里）。
+    t_s = t * sr
+    ok = dbs <= ref_db - margin
+    cand = np.where(ok & (poss >= t_s - 0.02 * sr))[0]
+    if len(cand):
+        k = cand[np.argmin(np.abs(poss[cand] - t_s))]
+        return (int(poss[k]), float(dbs[k]))
+    after = np.where(poss >= t_s)[0]
+    if len(after):
+        k = after[np.argmin(dbs[after])]
+        return (int(poss[k]), float(dbs[k]))
+    k = int(np.argmin(dbs))
+    return (int(poss[k]), float(dbs[k]))
+
+
 def apply_edits(x, sr, edits, bed, fade=0.010):
     """edits=[(t_sec, 'ins'|'del', amount_sec, label)]，从后往前执行（索引不偏移）。
 
@@ -317,7 +377,28 @@ def apply_edits(x, sr, edits, bed, fade=0.010):
     for e in sorted(edits, key=lambda e: -e[0]):
         t, kind, amt = e[0], e[1], e[2]
         if kind == 'ins':
-            c = int(np.clip(int(t * sr), 1, len(out) - 1))
+            # 2026-11-25 修：原来 c = t*sr，t 是 faster-whisper 的词边界，
+            # 落在词尾辅音上就把词劈开（c1_0174 himself → "himse … lf"，
+            # 贪心解码吐出 "HIMSELF OLF"）。改成只在能量谷切，找不到就跳过。
+            hit = quiet_point(out, sr, t, ref)
+            if hit is None:
+                skipped.append((round(t, 3), round(amt, 3)))
+                INS_STATS['skip'] += 1
+                continue
+            c, c_db = hit
+            if c_db <= ref - 18.0:
+                INS_STATS['deep'] += 1
+            else:
+                # 2026-11-25 修 3：原来 ref−8 还允许插入（"weak"），实测会出碎点。
+                # c1_0008 @1.38 该处根本没有静音（1.30–1.72 全是 −25~−33 dB，只有 1.50 一个
+                # −37.8 的低点），插进去就把那段拖音夹成「洞 + 0.24s 有声 + 洞」——
+                # 正是用户听到的「突然停一下」。旁白宁可不插，也不碎：
+                # 该处模型是用延长代替停顿（expr weak），补静音补不回 pitch reset。
+                skipped.append((round(t, 3), round(amt, 3)))
+                INS_STATS['weak'] += 1
+                INS_STATS['skip'] += 1
+                continue
+            c = int(np.clip(c, 1, len(out) - 1))
             head, tail = out[:c].copy(), out[c:].copy()
             if len(head) > nf and len(tail) > nf:
                 head[-nf:] *= np.linspace(1.0, 0.0, nf, dtype=out.dtype)
