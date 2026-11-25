@@ -68,8 +68,11 @@
 
 | 要什么 | 去哪 |
 |---|---|
-| 现在在哪、下一步第一件事 | `F:/Charles/HANDOFF.md`（11-25 重写，83 行） |
-| 为什么这么做 / 哪些路已走死 | `G:/_setup/DECISIONS.md` |
+| **做什么事读哪个文件（总路由）** | **`~/.workbuddy/RUNBOOK.md`**（20+ 条；新守则先加正文再挂一行） |
+| 云端 GPU / 部署 / 上传取回 / 关机 | `~/.workbuddy/runbooks/cloud-gpu.md` |
+| 提交 git（两个仓库，别只提一个） | `~/.workbuddy/runbooks/git-commit.md` |
+| 现在在哪、下一步第一件事 | `F:/Charles/HANDOFF.md`（11-25 重写，前 55 行注入） |
+| 为什么这么做 / 哪些路已走死 | `G:/_setup/DECISIONS.md`（`grep -n '^## ⛔'` 看已否决） |
 | 验收 29 条 | `G:/_setup/REQUIREMENTS.md` |
 | 两周硬教训（10 条） | Skill `dots-tts-dubbing` §18.47 |
 | 本文件历史（1096 行） | `G:/_setup/_archive/STATE_20261125_1096l.md` |
